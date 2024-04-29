@@ -6,6 +6,8 @@ import ExerciseForm from "./ExerciseForm";
 import DataTable from "./DataTable";
 import columns from "./Columns";
 import { LiftsForm } from "./LiftsForm";
+import FormPractice from "./FormPractice";
+import DataResponse from "./DataResponse";
 
 const Lifts = () => {
   const [lifts, setLifts] = useState([]);
@@ -106,6 +108,8 @@ const Lifts = () => {
     <div className="container mx-auto py-10">
       {/* <ExerciseForm onMuscleSelect={handleMuscleSelect} /> */}
       <LiftsForm options={muscleGroups} onMuscleSelect={handleMuscleSelect} />
+      <FormPractice />
+      <DataResponse />
       <DataTable columns={columns} lifts={lifts} />
     </div>
   );

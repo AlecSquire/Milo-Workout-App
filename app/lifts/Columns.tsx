@@ -1,5 +1,6 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
+import { Columns } from "lucide-react";
 
 // Define your columns
 const columns: ColumnDef<Exercise>[] = [
@@ -28,3 +29,4 @@ const columns: ColumnDef<Exercise>[] = [
     header: "Instructions",
   },
 ];
+export default Columns;

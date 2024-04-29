@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import MainNav from "@/components/MainNav";
+import ChatBot from "./ChatBot";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,6 +35,7 @@ export default function RootLayout({
               </main>
             </div>
           </nav>
+          <ChatBot />
         </ThemeProvider>
       </body>
     </html>

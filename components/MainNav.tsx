@@ -21,6 +21,7 @@ const MainNav = () => {
         <Link href="/start">Start a session </Link>
         <Link href="/routines">Routines</Link>
         <Link href="/lifts">Lifts </Link>
+        <Link href="./info">Info</Link>
       </div>
       <div className="flex flex-auto w-32 justify-around">
         <ModeToggle />
