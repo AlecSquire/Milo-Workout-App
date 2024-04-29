@@ -1,24 +1,26 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+// Lifts.js
+import React, { useEffect, useState } from "react";
+import ExerciseForm from "./ExerciseForm";
 import DataTable from "./DataTable";
 import columns from "./Columns";
+import { LiftsForm } from "./LiftsForm";
 
 const Lifts = () => {
   const [lifts, setLifts] = useState([]);
-  // Use a state or context if you plan to make it dynamic
-  const muscleType = "traps";
+  const [muscleType, setMuscleType] = useState("");
 
-  const apiUrl = `https://api.api-ninjas.com/v1/exercises?${muscleType}=`;
+  const apiUrl = `https://api.api-ninjas.com/v1/exercises?muscle=${muscleType}`;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(apiUrl, {
-          method: "GET", // method is optional since GET is the default
+          method: "GET",
           headers: {
             "X-Api-Key": "vjWYBohac5H2XORXnBSkjg==S4vvZl7nnLimZMaB",
           },
-          // contentType header is not needed when making GET requests, it's mainly for POST/PUT requests
         });
 
         if (!response.ok) {
@@ -26,30 +28,85 @@ const Lifts = () => {
         }
 
         const responseData = await response.json();
-        setLifts(responseData); // Assuming responseData is directly an array of exercises
+        setLifts(responseData);
       } catch (error) {
         console.error("Error:", error);
       }
     };
 
-    fetchData();
-  }, [apiUrl]); // Depend on apiUrl to refetch if it changes
+    if (muscleType) {
+      fetchData();
+    }
+  }, [apiUrl, muscleType]);
+
+  const handleMuscleSelect = (selectedMuscle) => {
+    setMuscleType(selectedMuscle);
+  };
+
+  const muscleGroups = [
+    {
+      id: "biceps",
+      label: "Biceps",
+    },
+    {
+      id: "calves",
+      label: "Calves",
+    },
+    {
+      id: "chest",
+      label: "Chest",
+    },
+    {
+      id: "forearms",
+      label: "Forearms",
+    },
+    {
+      id: "glutes",
+      label: "Glutes",
+    },
+    {
+      id: "hamstrings",
+      label: "Hamstrings",
+    },
+    {
+      id: "lats",
+      label: "Lats",
+    },
+    {
+      id: "lower_back",
+      label: "Lower Back",
+    },
+    {
+      id: "middle_back",
+      label: "Middle Back",
+    },
+    {
+      id: "neck",
+      label: "Neck",
+    },
+    {
+      id: "quadriceps",
+      label: "Quadriceps",
+    },
+    {
+      id: "traps",
+      label: "Traps",
+    },
+    {
+      id: "triceps",
+      label: "Triceps",
+    },
+    {
+      id: "abdominals",
+      label: "Abdominals",
+    },
+  ];
 
   return (
-    <div>
-      {lifts.map(
-        (
-          { name, type, muscle, equipment, difficulty, instructions },
-          index
-        ) => (
-          <div key={index}></div>
-        )
-      )}
-      <div className="container mx-auto py-10">
-        {/* <DataTable columns={columns} data={data} /> */}
-
-        <DataTable columns={columns} lifts={lifts} />
-      </div>
+    <div className="container mx-auto py-10">
+      {/* <ExerciseForm onMuscleSelect={handleMuscleSelect} /> */}
+      <LiftsForm options={muscleGroups} onMuscleSelect={handleMuscleSelect} />
+      <DataTable columns={columns} lifts={lifts} />
     </div>
   );
 };

@@ -18,6 +18,7 @@ const MainNav = () => {
       </div>
       <div className="flex items-space justify-between flex-auto w-64 mr-8">
         <Link href="/">DashBoard</Link>
+        <Link href="/start">Start a session </Link>
         <Link href="/routines">Routines</Link>
         <Link href="/lifts">Lifts </Link>
       </div>
