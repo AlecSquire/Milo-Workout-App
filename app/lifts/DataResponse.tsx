@@ -1,12 +1,12 @@
-"use client";
-
 // Lifts.js
 import React, { useEffect, useState } from "react";
-
+import { loadEnvConfig } from "@next/env";
 const DataResponse = ({ finalURL }) => {
   const [lifts, setLifts] = useState([]);
   console.log(lifts);
   console.log(finalURL);
+  console.log(process.env.NEXT_PUBLIC_REACT_APP_API_KEY);
+  console.log(process.env);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -15,7 +15,7 @@ const DataResponse = ({ finalURL }) => {
           const response = await fetch(finalURL, {
             method: "GET",
             headers: {
-              "X-Api-Key": "vjWYBohac5H2XORXnBSkjg==S4vvZl7nnLimZMaB",
+              "X-Api-Key": process.env.NEXT_PUBLIC_REACT_APP_API_KEY,
             },
           });
 

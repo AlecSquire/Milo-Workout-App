@@ -13,7 +13,7 @@ const Lifts = () => {
   const [lifts, setLifts] = useState([]);
   const [muscleType, setMuscleType] = useState("");
 
-  const apiUrl = `https://api.api-ninjas.com/v1/exercises?muscle=${muscleType}`;
+  const apiUrl = `https://api.api-ninjas.com/v1/exercises?muscle=${muscleType}?offset=2`;
 
   useEffect(() => {
     const fetchData = async () => {
