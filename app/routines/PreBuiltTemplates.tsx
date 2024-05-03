@@ -1,7 +1,14 @@
-"use client";
 import { useEffect, useState } from "react";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase/config";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { Card } from "@/components/ui/card";
 
 const PreBuiltTemplates = () => {
   interface Routine {
@@ -32,20 +39,17 @@ const PreBuiltTemplates = () => {
   }, []);
 
   return (
-    <>
-      <div className="flex flex-col">
-        {preBuiltRoutinesArray.map((routine, index) => (
-          <div key={index} className="flex flex-wrap gap-4 mb-4">
-            <div className="w-64 p-4 border border-gray-300 rounded cursor-pointer transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md">
-              <h2 className="text-lg font-bold mb-2">{routine.item}</h2>
-              <p className="text-sm text-gray-700  mb-4">
-                {routine.description}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </>
+    <Card style={{ height: "70vh", overflowY: "hidden" }}>
+      {preBuiltRoutinesArray.map((routine, index) => (
+        <div
+          key={index}
+          className="w-64 p-4 border border-gray-300 rounded cursor-pointer transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md"
+        >
+          <h2 className="text-lg font-bold mb-2">{routine.name}</h2>
+          <p className="text-sm text-gray-700  mb-4">{routine.description}</p>
+        </div>
+      ))}
+    </Card>
   );
 };
 
