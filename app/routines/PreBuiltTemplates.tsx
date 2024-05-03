@@ -9,12 +9,13 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Card } from "@/components/ui/card";
+import DropDown from "./DropDown";
 
 const PreBuiltTemplates = () => {
   interface Routine {
     item: string;
     description: string;
-    id?: string | number;
+    id?: string;
   }
 
   const [preBuiltRoutinesArray, setPreBuiltRoutinesArray] = useState<Routine[]>(
@@ -43,10 +44,12 @@ const PreBuiltTemplates = () => {
       {preBuiltRoutinesArray.map((routine, index) => (
         <div
           key={index}
-          className="w-64 p-4 border border-gray-300 rounded cursor-pointer transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md"
+          className="w-100% p-4 border border-gray-300 rounded cursor-pointer transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md"
         >
           <h2 className="text-lg font-bold mb-2">{routine.name}</h2>
           <p className="text-sm text-gray-700  mb-4">{routine.description}</p>
+
+          <DropDown />
         </div>
       ))}
     </Card>
