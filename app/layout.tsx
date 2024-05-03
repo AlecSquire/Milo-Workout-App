@@ -44,7 +44,7 @@ export default async function RootLayout({
               </main>
             </div>
           </nav>
-          <ChatBot />
+          {/* <ChatBot /> */}
         </ThemeProvider>
         {/* </SessionProvider> */}
       </body>

@@ -1,33 +1,34 @@
 "use client";
-import { Description } from "@radix-ui/react-toast";
+
 import { useEffect, useState, FormEvent } from "react";
 import {
   collection,
   getDocs,
   addDoc,
-  querySnapshot,
   query,
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/firebase/config";
 
 import { VscAdd } from "react-icons/vsc";
-import { Item } from "@radix-ui/react-dropdown-menu";
-import { describe } from "node:test";
 
-type StandardTemplates = Array<{ item: string; description: string }>;
-
+type UserTemplates = Array<{ item: string; description: string }>;
+type routinesArray = {
+  id: number;
+};
 interface Routine {
   item: string;
   description: string;
+  id?: number;
 }
 
-const RoutineTemplates: React.FC = () => {
+const UserTemplates: React.FC = () => {
   const [newRoutine, setNewRoutine] = useState<Routine>({
     item: "",
     description: "",
   });
-  const [standardTemplates, setStandardTemplates] = useState<Routine[]>([]);
+  const [userTemplates, setUserTemplates] = useState<Routine[]>([]);
+
   //add item to DB
   const addRoutine = async (e: FormEvent) => {
     e.preventDefault();
@@ -46,17 +47,15 @@ const RoutineTemplates: React.FC = () => {
     }
   };
 
-  //read items to DB
-
   useEffect(() => {
     const q = query(collection(db, "userRoutines"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let routinesArray = [];
+      let routinesArray: Routine[] = [];
 
       querySnapshot.forEach((doc) => {
         routinesArray.push({ ...doc.data(), id: doc.id });
       });
-      setStandardTemplates(routinesArray);
+      setUserTemplates(routinesArray);
     });
 
     // Cleanup function to unsubscribe when component unmounts or when the effect is re-run
@@ -64,7 +63,6 @@ const RoutineTemplates: React.FC = () => {
       unsubscribe();
     };
   }, []); // Empty dependencies array means the effect runs only once after the initial render
-
   //delete  item to DB
 
   return (
@@ -99,7 +97,7 @@ const RoutineTemplates: React.FC = () => {
             <VscAdd style={{ width: "200px" }} />
           </button>
         </form>
-        {standardTemplates.map((routine, index) => (
+        {userTemplates.map((routine, index) => (
           <div key={index} className="flex flex-wrap gap-4 mb-4">
             <div className="w-64 p-4 border border-gray-300 rounded cursor-pointer transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md">
               <h2 className="text-lg font-bold mb-2">{routine.item}</h2>
@@ -113,4 +111,4 @@ const RoutineTemplates: React.FC = () => {
     </>
   );
 };
-export default RoutineTemplates;
+export default UserTemplates;
