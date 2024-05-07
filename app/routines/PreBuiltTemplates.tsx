@@ -40,7 +40,7 @@ const PreBuiltTemplates = () => {
   }, []);
 
   return (
-    <Card style={{ height: "70vh", overflowY: "hidden" }}>
+    <Card style={{ height: "70vh", overflowY: "auto" }}>
       {preBuiltRoutinesArray.map((routine, index) => (
         <div
           key={index}

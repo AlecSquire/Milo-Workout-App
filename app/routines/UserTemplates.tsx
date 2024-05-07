@@ -75,7 +75,7 @@ const UserTemplates: React.FC = ({ userTemplates, setUserTemplates }) => {
   };
 
   return (
-    <Card style={{ height: "70vh", overflowY: "hidden" }}>
+    <Card style={{ height: "70vh", overflowY: "auto" }}>
       {userTemplates.map((routine, index) => (
         <div
           key={index}
