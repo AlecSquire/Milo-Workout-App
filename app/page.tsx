@@ -1,7 +1,7 @@
 "use client";
 import MiloImage from "../public/Milo2.png";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import FormPractice from "./lifts/FormPractice";
 import { Button } from "@/components/ui/button";
 import DataResponse from "./lifts/DataResponse";
@@ -15,6 +15,7 @@ import { Router } from "next/router";
 import { useRouter } from "next/navigation";
 
 export default function Home({ finalURL }) {
+  // const [userTemplates, setUserTemplates] = useState([]);
   const [user] = useAuthState(auth);
   console.log({ user });
   console.log(finalURL);

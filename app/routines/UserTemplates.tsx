@@ -28,9 +28,9 @@ import {
   query,
   onSnapshot,
 } from "firebase/firestore";
+import { db } from "@/firebase/config";
 import { doc, deleteDoc } from "firebase/firestore";
 import DropDown from "./DropDown";
-import { db } from "@/firebase/config";
 import { Trash } from "lucide-react";
 type UserTemplates = Array<{ item: string; description: string }>;
 type routinesArray = {
