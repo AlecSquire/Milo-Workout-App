@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/config";
 import Link from "next/link";
+import { SessionStorageValue } from "@/types";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -18,7 +19,7 @@ const SignUp = () => {
   useEffect(() => {
     if (user) {
       console.log(user); // This should log the user's data
-      sessionStorage.setItem("user", true);
+      sessionStorage.setItem("user", true.toString());
       // Redirect or perform additional operations here
     }
   }, [user]);

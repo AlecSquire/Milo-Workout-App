@@ -7,7 +7,6 @@ const StartWorkout = () => {
     <>
       <div className="flex flex-col h-96 ">
         <StopWatch />
-        <div className=""></div>
 
         <StartBlankWorkoutForm />
       </div>

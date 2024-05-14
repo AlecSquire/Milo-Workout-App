@@ -28,12 +28,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-type UserTemplates = Array<{ item: string; description: string }>;
+type UserTemplates = Array<{ workoutName: string; description: string }>;
 type routinesArray = {
   id: number;
 };
 interface Routine {
-  item: string;
+  workoutName: string;
   description: string;
   id?: number;
 }
@@ -41,22 +41,22 @@ interface Routine {
 export default function CreateTemplate() {
   //   const [userTemplates, setUserTemplates] = useState<Routine[]>([]);
   const [newRoutine, setNewRoutine] = useState<Routine>({
-    item: "",
+    workoutName: "",
     description: "",
   });
   // Empty dependencies array means the effect runs only once after the initial render
-  //delete  item to DB
-  //add item to DB
+  //delete  workoutName to DB
+  //add workoutName to DB
   const addRoutine = async (e: FormEvent) => {
     e.preventDefault();
-    if (newRoutine.item && newRoutine.description) {
+    if (newRoutine.workoutName && newRoutine.description) {
       try {
         const docRef = await addDoc(collection(db, "userRoutines"), {
-          item: newRoutine.item,
+          workoutName: newRoutine.workoutName,
           description: newRoutine.description,
         });
         console.log("Document written with ID: ", docRef.id);
-        setNewRoutine({ item: "", description: "" }); // Reset the form
+        setNewRoutine({ workoutName: "", description: "" }); // Reset the form
         // fetchRoutines(); // Refresh the list of routines
       } catch (error) {
         console.error("Error adding document: ", error);
@@ -80,12 +80,12 @@ export default function CreateTemplate() {
               <Input
                 id="name"
                 onChange={(e) =>
-                  setNewRoutine({ ...newRoutine, item: e.target.value })
+                  setNewRoutine({ ...newRoutine, workoutName: e.target.value })
                 }
-                name="item"
+                name="workoutName"
                 type="text"
                 placeholder="Enter routine name"
-                value={newRoutine.item}
+                value={newRoutine.workoutName}
               />
             </div>
             <div className="flex flex-col space-y-1.5">

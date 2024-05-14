@@ -3,13 +3,6 @@ import { useEffect, useState, FormEvent } from "react";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -32,40 +25,51 @@ import { db } from "@/firebase/config";
 import { doc, deleteDoc } from "firebase/firestore";
 import DropDown from "./DropDown";
 import { Trash } from "lucide-react";
-type UserTemplates = Array<{ item: string; description: string }>;
-type routinesArray = {
-  id: number;
-};
-interface Routine {
-  item: string;
-  description: string;
-  id?: number;
+import { IWorkout, FormFields } from "@/types";
+
+interface UserTemplatesProps {
+  userTemplates: FormFields[];
+  setUserTemplates: React.Dispatch<React.SetStateAction<FormFields[]>>;
 }
 
-const UserTemplates: React.FC = ({ userTemplates, setUserTemplates }) => {
+const UserTemplates = ({
+  userTemplates,
+  setUserTemplates,
+}: UserTemplatesProps) => {
   const router = useRouter();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [routineToDelete, setRoutineToDelete] = useState<Routine | null>(null);
-  const [modalTemplate, setModalTemplate] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+  const [routineToDelete, setRoutineToDelete] = useState<FormFields | null>(
+    null
+  );
+  const [selectedRoutineIndex, setSelectedRoutineIndex] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
-    const q = query(collection(db, "userRoutines"));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let routinesArray: Routine[] = [];
+    const unsubscribe = onSnapshot(
+      collection(db, "userRoutines"),
+      (snapshot) => {
+        const routinesArray: FormFields[] = [];
+        snapshot.forEach((doc) => {
+          routinesArray.push({ ...doc.data(), id: doc.id } as FormFields);
+        });
+        setUserTemplates(routinesArray);
+      }
+    );
 
-      querySnapshot.forEach((doc) => {
-        routinesArray.push({ ...doc.data(), id: doc.id });
-      });
-      setUserTemplates(routinesArray);
-    });
-
-    // Cleanup function to unsubscribe when component unmounts or when the effect is re-run
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [setUserTemplates]);
+
+  const hasId = (
+    routine: FormFields
+  ): routine is FormFields & { id: string } => {
+    return !!routine.id;
+  };
+
   const deleteItem = async () => {
-    if (routineToDelete) {
+    if (routineToDelete && hasId(routineToDelete)) {
       try {
         await deleteDoc(doc(db, "userRoutines", routineToDelete.id));
         console.log("Document successfully deleted!");
@@ -77,17 +81,20 @@ const UserTemplates: React.FC = ({ userTemplates, setUserTemplates }) => {
     setDeleteDialogOpen(false);
   };
 
+  const handleRoutineClick = (index: number) => {
+    setSelectedRoutineIndex(index);
+  };
   return (
-    <Card style={{ height: "70vh", overflowY: "auto" }}>
-      {userTemplates.map((routine, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between w-full p-4 border border-gray-300 rounded cursor-pointer transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-md w-100%"
-          onClick={() => setModalTemplate(true)} // Open modal when clicking on the routine item
-        >
-          <div>
-            <h2 className="text-lg font-bold mb-2">{routine.item}</h2>
-            <p className="text-sm text-gray-700 mb-4">{routine.description}</p>
+    <>
+      <Card style={{ height: "70vh", overflowY: "auto" }}>
+        {userTemplates.map((routine, index) => (
+          <div
+            key={index}
+            className="routine-item"
+            onClick={() => handleRoutineClick(index)}
+          >
+            <h2>{routine.data?.workoutName}</h2>
+            <p>{routine.data?.description}</p>
             <div className="flex items-center">
               <DropDown id={routine.id} />
               <Trash
@@ -100,49 +107,9 @@ const UserTemplates: React.FC = ({ userTemplates, setUserTemplates }) => {
               />
             </div>
           </div>
-        </div>
-      ))}
-      {/* Modal Preview of workout template */}
-      {modalTemplate && (
-        <AlertDialog
-          open={modalTemplate} // Set open to modalTemplate
-          onClose={() => setModalTemplate(false)}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Workout Name</AlertDialogTitle>
-              <AlertDialogDescription>
-                {" "}
-                <ul>
-                  <li>Exercise 1</li>
-                  <li>Exercise 2</li>
-                  <li>Exercise 3</li>
-                  <li>Exercise 4</li>
-                </ul>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel onClick={() => setModalTemplate(false)}>
-                Cancel
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  setModalTemplate(false); // Close the modal
-                  router.push("routines/[RoutineID]"); // Navigate to the new route
-                }}
-              >
-                Start Workout
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-
-      {/* Alert Dialog */}
-      <AlertDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-      >
+        ))}
+      </Card>
+      <AlertDialog open={deleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -159,7 +126,47 @@ const UserTemplates: React.FC = ({ userTemplates, setUserTemplates }) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Card>
+
+      {selectedRoutineIndex !== null && (
+        <AlertDialog open={selectedRoutineIndex !== null}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <h2>{userTemplates[selectedRoutineIndex].data?.workoutName}</h2>
+              <p>{userTemplates[selectedRoutineIndex].data?.description}</p>
+            </AlertDialogHeader>
+            <AlertDialogDescription>
+              <div className="routine-details">
+                {userTemplates[selectedRoutineIndex].data.workout?.map(
+                  (workout, index) => (
+                    <div key={index} className="workout-item">
+                      <p>Exercise: {workout.exercise}</p>
+                      <p>Reps: {workout.reps}</p>
+                      <p>Sets: {workout.sets}</p>
+                      <p>Weight: {workout.weight}</p>
+                      <br />
+                    </div>
+                  )
+                )}
+              </div>
+            </AlertDialogDescription>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setSelectedRoutineIndex(null)}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  setSelectedRoutineIndex(null);
+                  router.push("/routines/[RoutineID]");
+                }}
+              >
+                Start Workout
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </>
   );
 };
+
 export default UserTemplates;

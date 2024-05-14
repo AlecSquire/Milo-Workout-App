@@ -1,41 +1,48 @@
 "use client";
+import { useEffect, useState, FormEvent } from "react";
 import { FormField } from "@/components/ui/form";
-import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
+import {
+  useForm,
+  SubmitHandler,
+  // setValue,
+  useFieldArray,
+} from "react-hook-form";
 import { number } from "zod";
 
-interface IFormInput {
-  workoutName: string;
-  exerciseName?: string;
-  bodyPart?: BodyPartEnum;
-  category?: CategoryEnum;
-}
+import {
+  collection,
+  getDocs,
+  addDoc,
+  query,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "@/firebase/config";
+import { Description } from "@radix-ui/react-toast";
+import { FormFields, IWorkout, StartNewForm } from "@/types";
 
-enum BodyPartEnum {
-  core = "core",
-  arms = "arms",
-  back = "back",
-  chest = "chest",
-  legs = "legs",
-  shoulders = "shoulders",
-  fullBody = "fullBody",
-  other = "other",
-}
+// interface IFormInput {
+//   workoutName: string;
+//   exerciseName?: string;
+//   bodyPart?: BodyPartEnum;
+//   category?: CategoryEnum;
+// }
 
-enum CategoryEnum {
-  barbell = "barbell",
-  dumbbell = "dumbbell",
-  machine = "machine",
-}
+// enum BodyPartEnum {
+//   core = "core",
+//   arms = "arms",
+//   back = "back",
+//   chest = "chest",
+//   legs = "legs",
+//   shoulders = "shoulders",
+//   fullBody = "fullBody",
+//   other = "other",
+// }
 
-type FormFields = {
-  workout: {
-    exerciseName: string;
-    reps: number | string;
-    sets: number;
-    weight: number;
-    complete: boolean;
-  };
-};
+// enum CategoryEnum {
+//   barbell = "barbell",
+//   dumbbell = "dumbbell",
+//   machine = "machine",
+// }
 
 export default function StartBlankWorkoutForm() {
   const {
@@ -43,65 +50,115 @@ export default function StartBlankWorkoutForm() {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<FormFields>({
+  } = useForm<StartNewForm>({
     defaultValues: {
       workout: [{ exercise: "", reps: 0, sets: 0, weight: 0, complete: false }],
     },
   });
-  const onSubmit: SubmitHandler<IFormInput> = (data) => console.log(data);
-  // handleSubmit(async (data) => await fetchAPI(data))
 
-  const { fields, append, remove } = useFieldArray<FormFields>({
+  const { fields, append, remove } = useFieldArray<
+    StartNewForm,
+    "workout",
+    "id"
+  >({
     control, // control props comes from useForm (optional: if you are using FormProvider)
     name: "workout", // unique name for your Field Array
   });
+
+  //add item to DB
+  const onSubmit: SubmitHandler<StartNewForm> = async (data) => {
+    console.log(data);
+    try {
+      // const { workout, workoutFields } = data; // Destructure workoutName and workout from data
+      // const combinedData = [{ workoutFields }, { workout }]; // Create an array containing both objects
+      const docRef = await addDoc(collection(db, "userRoutines"), {
+        // combinedData: combinedData, // Push the array of combined objects
+        data: data,
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
+  };
 
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <label>Workout Name</label>
-        <input {...register("workoutName")} />
+        <input
+          type="string"
+          {...register(`workoutName`, { required: true })}
+          style={{ background: "blue" }}
+        />
+        <label>Description</label>
+        <input
+          type="string"
+          {...register("description", { required: false })}
+          style={{ background: "blue" }}
+        />
         {fields.map((field, index) => (
-          <section
-            key={field.id}
-            className={field.complete ? "bg-green-200" : ""}
-          >
-            <label>Add Exercise Name</label>
-            <input type="string" {...register(`workout.${index}.exercise`)} />
+          <section key={field.id} style={{ background: "grey" }}>
+            <label>Exercise Name</label>
+            <input
+              type="string"
+              {...register(`workout.${index}.exercise` as const)}
+              style={{ background: "blue" }}
+            />
             <label>Add Sets</label>
-            <input type="number" {...register(`workout.${index}.sets`)} />
+            <input
+              type="number"
+              {...register(`workout.${index}.sets` as const, {
+                valueAsNumber: true,
+              })}
+              style={{ background: "blue" }}
+            />
             <label>Add reps</label>
             <input
               type="number | string"
-              {...register(`workout.${index}.reps`)}
+              {...register(`workout.${index}.reps` as const)}
+              style={{ background: "blue" }}
             />
             <label>Add weight</label>
             <input
               type="number"
-              {...register(`workout.${index}.weight`)}, {value}/>
+              {...register(`workout.${index}.weight` as const, {
+                valueAsNumber: true,
+              })}
+              style={{ background: "blue" }}
+            />
             <input
               type="checkbox"
-              {...register(`workout.${index}.complete`)}
-            ></input>
-            {/* if true row green  */}
+              className="checkBox"
+              {...register(`workout.${index}.complete` as const)}
+            />
+            <button type="button" onClick={() => remove(index)}>
+              Remove exercise
+            </button>
           </section>
         ))}
-        <button type="button" onClick={() => append()}>
-          {" "}
+        <button
+          type="button"
+          onClick={() =>
+            append({
+              exercise: "",
+              reps: 0,
+              sets: 0,
+              weight: 0,
+              complete: false,
+            })
+          }
+        >
           Add exercise
         </button>
-        <button type="button" onClick={() => remove(index)}>
-          {" "}
-          Remove exercise{" "}
-        </button>
+
+        <p>{errors.workout?.root?.message}</p>
         <button type="submit">Finish workout</button>
       </form>
     </>
   );
 }
 
-{
-  /* <label>Add Exercise Name</label>
+/* <label>Add Exercise Name</label>
 <input {...register("exerciseName")} />
 <label>Body Part</label>
 <select {...register("bodyPart")}>
@@ -120,4 +177,3 @@ export default function StartBlankWorkoutForm() {
   <option value="dumbbell">dumbbell</option>
   <option value="machine">machine</option>
 </select> */
-}
