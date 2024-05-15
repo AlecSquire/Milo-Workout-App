@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/config";
 import Link from "next/link";
-import { SessionStorageValue } from "@/types";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");

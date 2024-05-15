@@ -1,78 +1,68 @@
 "use client";
-import { useEffect, useState, FormEvent } from "react";
-import { FormField } from "@/components/ui/form";
-import {
-  useForm,
-  SubmitHandler,
-  // setValue,
-  useFieldArray,
-} from "react-hook-form";
-import { number } from "zod";
-
-import {
-  collection,
-  getDocs,
-  addDoc,
-  query,
-  onSnapshot,
-} from "firebase/firestore";
+import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
+import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { Description } from "@radix-ui/react-toast";
-import { FormFields, IWorkout, StartNewForm } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
-// interface IFormInput {
-//   workoutName: string;
-//   exerciseName?: string;
-//   bodyPart?: BodyPartEnum;
-//   category?: CategoryEnum;
-// }
+const workoutSchema = z.object({
+  description: z.string().optional(),
+  workoutName: z
+    .string()
+    .min(2, { message: "Workout must have a name, between 2-50 characters." })
+    .max(50),
+  workout: z.array(
+    z.object({
+      exercise: z
+        .string()
+        .min(2, {
+          message: "You need to name your exercise, between 2-50 characters.",
+        })
+        .max(50),
+      reps: z.union([z.string(), z.number()]).optional(),
+      sets: z.number().optional(),
+      weight: z.number().optional(),
+      complete: z.boolean().default(false).optional(),
+    })
+  ),
+});
 
-// enum BodyPartEnum {
-//   core = "core",
-//   arms = "arms",
-//   back = "back",
-//   chest = "chest",
-//   legs = "legs",
-//   shoulders = "shoulders",
-//   fullBody = "fullBody",
-//   other = "other",
-// }
-
-// enum CategoryEnum {
-//   barbell = "barbell",
-//   dumbbell = "dumbbell",
-//   machine = "machine",
-// }
+type WorkoutFormValues = z.infer<typeof workoutSchema>;
 
 export default function StartBlankWorkoutForm() {
+  const form = useForm<WorkoutFormValues>({
+    resolver: zodResolver(workoutSchema),
+    defaultValues: {
+      workout: [{ exercise: "", reps: 0, sets: 0, weight: 0, complete: false }],
+    },
+  });
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<StartNewForm>({
-    defaultValues: {
-      workout: [{ exercise: "", reps: 0, sets: 0, weight: 0, complete: false }],
-    },
+  } = form;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "workout",
   });
 
-  const { fields, append, remove } = useFieldArray<
-    StartNewForm,
-    "workout",
-    "id"
-  >({
-    control, // control props comes from useForm (optional: if you are using FormProvider)
-    name: "workout", // unique name for your Field Array
-  });
-
-  //add item to DB
-  const onSubmit: SubmitHandler<StartNewForm> = async (data) => {
+  const onSubmit: SubmitHandler<WorkoutFormValues> = async (data) => {
     console.log(data);
     try {
-      // const { workout, workoutFields } = data; // Destructure workoutName and workout from data
-      // const combinedData = [{ workoutFields }, { workout }]; // Create an array containing both objects
       const docRef = await addDoc(collection(db, "userRoutines"), {
-        // combinedData: combinedData, // Push the array of combined objects
         data: data,
       });
       console.log("Document written with ID: ", docRef.id);
@@ -82,61 +72,152 @@ export default function StartBlankWorkoutForm() {
   };
 
   return (
-    <>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <label>Workout Name</label>
-        <input
-          type="string"
-          {...register(`workoutName`, { required: true })}
-          style={{ background: "blue" }}
+    <Form {...form}>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={control}
+          name="workoutName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Workout Name</FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  {...register("workoutName", { required: true })}
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                This is your unique name for the workout routine
+              </FormDescription>
+              <FormMessage>
+                {errors.workoutName && (
+                  <span>{errors.workoutName.message}</span>
+                )}
+              </FormMessage>
+            </FormItem>
+          )}
         />
-        <label>Description</label>
-        <input
-          type="string"
-          {...register("description", { required: false })}
-          style={{ background: "blue" }}
+
+        <FormField
+          control={control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description</FormLabel>
+              <FormControl>
+                <Input type="text" {...register("description")} {...field} />
+              </FormControl>
+              <FormDescription>
+                Provide a brief description of the workout
+              </FormDescription>
+            </FormItem>
+          )}
         />
+
         {fields.map((field, index) => (
-          <section key={field.id} style={{ background: "grey" }}>
-            <label>Exercise Name</label>
-            <input
-              type="string"
-              {...register(`workout.${index}.exercise` as const)}
-              style={{ background: "blue" }}
+          <section key={field.id} className="space-y-4">
+            <FormField
+              control={control}
+              name={`workout.${index}.exercise`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Exercise Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      {...register(`workout.${index}.exercise` as const)}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage>
+                    {errors.workout?.[index]?.exercise && (
+                      <span>{errors.workout?.[index]?.exercise?.message}</span>
+                    )}
+                  </FormMessage>
+                </FormItem>
+              )}
             />
-            <label>Add Sets</label>
-            <input
-              type="number"
-              {...register(`workout.${index}.sets` as const, {
-                valueAsNumber: true,
-              })}
-              style={{ background: "blue" }}
+
+            <FormField
+              control={control}
+              name={`workout.${index}.sets`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Add Sets</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...register(`workout.${index}.sets` as const, {
+                        valueAsNumber: true,
+                      })}
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
-            <label>Add reps</label>
-            <input
-              type="number | string"
-              {...register(`workout.${index}.reps` as const)}
-              style={{ background: "blue" }}
+
+            <FormField
+              control={control}
+              name={`workout.${index}.reps`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Add Reps</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...register(`workout.${index}.reps` as const)}
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
-            <label>Add weight</label>
-            <input
-              type="number"
-              {...register(`workout.${index}.weight` as const, {
-                valueAsNumber: true,
-              })}
-              style={{ background: "blue" }}
+
+            <FormField
+              control={control}
+              name={`workout.${index}.weight`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Add Weight</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...register(`workout.${index}.weight` as const, {
+                        valueAsNumber: true,
+                      })}
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
-            <input
-              type="checkbox"
-              className="checkBox"
-              {...register(`workout.${index}.complete` as const)}
+
+            <FormField
+              control={control}
+              name={`workout.${index}.complete`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Complete</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="checkbox"
+                      {...register(`workout.${index}.complete` as const)}
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
-            <button type="button" onClick={() => remove(index)}>
+
+            <Button type="button" onClick={() => remove(index)}>
               Remove exercise
-            </button>
+            </Button>
           </section>
         ))}
-        <button
+
+        <Button
           type="button"
           onClick={() =>
             append({
@@ -149,31 +230,10 @@ export default function StartBlankWorkoutForm() {
           }
         >
           Add exercise
-        </button>
+        </Button>
 
-        <p>{errors.workout?.root?.message}</p>
-        <button type="submit">Finish workout</button>
+        <Button type="submit">Finish workout</Button>
       </form>
-    </>
+    </Form>
   );
 }
-
-/* <label>Add Exercise Name</label>
-<input {...register("exerciseName")} />
-<label>Body Part</label>
-<select {...register("bodyPart")}>
-  <option value="core">core</option>
-  <option value="arms">arms</option>
-  <option value="back">back</option>
-  <option value="chest">chest</option>
-  <option value="legs">legs</option>
-  <option value="shoulders">shoulders</option>
-  <option value="fullBody">full body</option>
-  <option value="other">other</option>
-</select>
-<label>Category</label>
-<select {...register("category")}>
-  <option value="barbell">barbel</option>
-  <option value="dumbbell">dumbbell</option>
-  <option value="machine">machine</option>
-</select> */
