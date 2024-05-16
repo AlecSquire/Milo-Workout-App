@@ -1,10 +1,8 @@
 export interface FormFields {
-  id?: string;
-  data: {
-    workoutName: string;
-    description?: string;
-    workout?: IWorkout[]; // Array of IWorkout objects
-  };
+  id: string;
+  workoutName: string;
+  description?: string;
+  workout: IWorkout[]; // Array of IWorkout objects
 }
 
 export interface IWorkout {
@@ -16,6 +14,7 @@ export interface IWorkout {
 }
 
 export type StartNewForm = {
+  id: string;
   workoutName: string;
   description?: string;
   workout: Array<{

@@ -1,4 +1,6 @@
 "use client";
+import RoutineLink from "@/components/RoutineLink";
+
 import { useEffect, useState, FormEvent } from "react";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
@@ -31,6 +33,7 @@ interface UserTemplatesProps {
   userTemplates: FormFields[];
   setUserTemplates: React.Dispatch<React.SetStateAction<FormFields[]>>;
 }
+type SelectedRoutineType = number | null;
 
 const UserTemplates = ({
   userTemplates,
@@ -41,9 +44,9 @@ const UserTemplates = ({
   const [routineToDelete, setRoutineToDelete] = useState<FormFields | null>(
     null
   );
-  const [selectedRoutineIndex, setSelectedRoutineIndex] = useState<
-    number | null
-  >(null);
+  const [selectedRoutineIndex, setSelectedRoutineIndex] =
+    useState<SelectedRoutineType>(null);
+  const [routineName, setRoutineName] = useState();
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
@@ -84,6 +87,7 @@ const UserTemplates = ({
   const handleRoutineClick = (index: number) => {
     setSelectedRoutineIndex(index);
   };
+  console.log(userTemplates);
   return (
     <>
       <Card style={{ height: "70vh", overflowY: "auto" }}>
@@ -93,8 +97,8 @@ const UserTemplates = ({
             className="routine-item"
             onClick={() => handleRoutineClick(index)}
           >
-            <h2>{routine.data?.workoutName}</h2>
-            <p>{routine.data?.description}</p>
+            <h2>{routine.workoutName}</h2>
+            <p>{routine.description}</p>
             <div className="flex items-center">
               <DropDown id={routine.id} />
               <Trash
@@ -131,12 +135,12 @@ const UserTemplates = ({
         <AlertDialog open={selectedRoutineIndex !== null}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <h2>{userTemplates[selectedRoutineIndex].data?.workoutName}</h2>
-              <p>{userTemplates[selectedRoutineIndex].data?.description}</p>
+              <h2>{userTemplates[selectedRoutineIndex]?.workoutName}</h2>
+              <p>{userTemplates[selectedRoutineIndex]?.description}</p>
             </AlertDialogHeader>
             <AlertDialogDescription>
               <div className="routine-details">
-                {userTemplates[selectedRoutineIndex].data.workout?.map(
+                {userTemplates[selectedRoutineIndex].workout?.map(
                   (workout, index) => (
                     <div key={index} className="workout-item">
                       <p>Exercise: {workout.exercise}</p>
@@ -153,13 +157,11 @@ const UserTemplates = ({
               <AlertDialogCancel onClick={() => setSelectedRoutineIndex(null)}>
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  setSelectedRoutineIndex(null);
-                  router.push("/routines/[RoutineID]");
-                }}
-              >
-                Start Workout
+              <AlertDialogAction>
+                {" "}
+                <RoutineLink
+                  routineId={userTemplates[selectedRoutineIndex].workoutName}
+                />
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

@@ -1,6 +1,6 @@
 "use client";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -31,7 +31,7 @@ const workoutSchema = z.object({
         })
         .max(50),
       reps: z.union([z.string(), z.number()]).optional(),
-      sets: z.number().optional(),
+      sets: z.union([z.string(), z.number()]).optional(),
       weight: z.number().optional(),
       complete: z.boolean().default(false).optional(),
     })
@@ -61,11 +61,23 @@ export default function StartBlankWorkoutForm() {
 
   const onSubmit: SubmitHandler<WorkoutFormValues> = async (data) => {
     console.log(data);
+
     try {
-      const docRef = await addDoc(collection(db, "userRoutines"), {
-        data: data,
+      // Join workoutName with hyphens between words
+      const formattedRoutineId = data.workoutName.replace(/\s+/g, "-");
+
+      // Use the formatted workoutName as the document ID
+      const documentId = formattedRoutineId;
+
+      // Create a document reference with the generated ID
+      const docRef = doc(db, "userRoutines", documentId);
+
+      // Set the data with the generated ID
+      await setDoc(docRef, {
+        ...data,
+        id: documentId,
       });
-      console.log("Document written with ID: ", docRef.id);
+      console.log("Document written with ID: ", documentId);
     } catch (error) {
       console.error("Error adding document: ", error);
     }
