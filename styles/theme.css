@@ -1,8 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
+/* @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 20 14.3% 4.1%;
@@ -23,7 +19,7 @@
     --border: 20 5.9% 90%;
     --input: 20 5.9% 90%;
     --ring: 24.6 95% 53.1%;
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 
   .dark {
@@ -47,26 +43,4 @@
     --input: 12 6.5% 15.1%;
     --ring: 20.5 90.2% 48.2%;
   }
-}
-
-/* styles.css */
-.orange-bg {
-  background-color: hsl(var(--primary)); /* Apply orange background color */
-  color: hsl(var(--primary-foreground)); /* Apply orange text color */
-  border-color: hsl(var(--border)); /* Apply orange border color */
-}
-
-.orange-button {
-  background-color: hsl(var(--primary)); /* Apply orange background color */
-  color: hsl(var(--primary-foreground)); /* Apply orange text color */
-  border-color: hsl(var(--border)); /* Apply orange border color */
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
+} */

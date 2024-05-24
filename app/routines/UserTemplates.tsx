@@ -28,6 +28,7 @@ import { doc, deleteDoc } from "firebase/firestore";
 import DropDown from "./DropDown";
 import { Trash } from "lucide-react";
 import { IWorkout, FormFields } from "@/types";
+import { useFetchCollectionsDb } from "@/lib/useFetchCollectionsDb";
 
 interface UserTemplatesProps {
   userTemplates: FormFields[];
@@ -48,22 +49,7 @@ const UserTemplates = ({
     useState<SelectedRoutineType>(null);
   const [routineName, setRoutineName] = useState();
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, "userRoutines"),
-      (snapshot) => {
-        const routinesArray: FormFields[] = [];
-        snapshot.forEach((doc) => {
-          routinesArray.push({ ...doc.data(), id: doc.id } as FormFields);
-        });
-        setUserTemplates(routinesArray);
-      }
-    );
-
-    return () => {
-      unsubscribe();
-    };
-  }, [setUserTemplates]);
+  useFetchCollectionsDb(setUserTemplates);
 
   const hasId = (
     routine: FormFields

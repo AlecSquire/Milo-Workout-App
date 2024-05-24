@@ -1,56 +1,33 @@
-// Lifts.js
-import React, { useEffect, useState } from "react";
-import { loadEnvConfig } from "@next/env";
-const DataResponse = ({ finalURL }) => {
-  const [lifts, setLifts] = useState([]);
-  console.log(lifts);
-  console.log(finalURL);
-  console.log(process.env.NEXT_PUBLIC_REACT_APP_API_KEY);
-  console.log(process.env);
+import { useEffect } from "react";
+import useFetchApi from "@/lib/useFetchApi";
+
+interface DataResponseProps {
+  finalURL: string;
+  headers: { "X-Api-Key"?: string }; // Adjusted type for headers prop
+  onLiftsLoaded: Function;
+  setIsLoading: Function;
+}
+const DataResponse = ({
+  finalURL,
+  headers,
+  onLiftsLoaded,
+  setIsLoading,
+}: DataResponseProps) => {
+  //custom hook for making fetch request
+  const { data: lifts, loading, error } = useFetchApi(finalURL, headers);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (finalURL) {
-        try {
-          const response = await fetch(finalURL, {
-            method: "GET",
-            headers: {
-              "X-Api-Key": process.env.NEXT_PUBLIC_REACT_APP_API_KEY,
-            },
-          });
+    if (loading) {
+      setIsLoading(true);
+    }
+    if (!loading && !error) {
+      // When lifts data is loaded, pass it to the parent component using the callback function
+      onLiftsLoaded(lifts);
+      setIsLoading(false);
+    }
+  }, [loading, error, lifts, onLiftsLoaded, setIsLoading]);
 
-          if (!response.ok) {
-            throw new Error(
-              `Network response was not okay: ${response.status}`
-            );
-          }
-
-          const responseData = await response.json();
-          setLifts(responseData);
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      }
-    };
-
-    fetchData();
-  }, [finalURL]); // Fetch data whenever finalURL changes
-  return (
-    <>
-      <p>hello</p>
-      {lifts.map((lift, key) => (
-        <div key={key}>
-          <p>{lift.name}</p>
-          <p>{lift.type}</p>
-          <p>{lift.muscle}</p>
-          <p>{lift.equipment}</p>
-          <p>{lift.difficulty}</p>
-          <p>{lift.instructions}</p>
-
-          <span>-----</span>
-        </div>
-      ))}
-    </>
-  );
+  if (error) return <p>Error: {error}</p>;
 };
+
 export default DataResponse;

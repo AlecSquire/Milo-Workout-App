@@ -49,24 +49,12 @@
   }
 }
 
-/* styles.css */
-.orange-bg {
-  background-color: hsl(var(--primary)); /* Apply orange background color */
-  color: hsl(var(--primary-foreground)); /* Apply orange text color */
-  border-color: hsl(var(--border)); /* Apply orange border color */
-}
-
-.orange-button {
-  background-color: hsl(var(--primary)); /* Apply orange background color */
-  color: hsl(var(--primary-foreground)); /* Apply orange text color */
-  border-color: hsl(var(--border)); /* Apply orange border color */
-}
-
 @layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }

@@ -36,7 +36,7 @@ const labels = [
   "strongman",
 ];
 
-export default function DropDown({ id }) {
+export default function DropDown({ id }: any) {
   const [label, setLabel] = React.useState("feature");
   const [open, setOpen] = React.useState(false);
 

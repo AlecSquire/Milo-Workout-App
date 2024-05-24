@@ -3,6 +3,7 @@ import Link from "next/link";
 import React from "react";
 import { ModeToggle } from "./ModeToggle";
 import Image from "next/image";
+import styles from "@/globals.css";
 
 const MainNav = () => {
   return (
@@ -18,7 +19,7 @@ const MainNav = () => {
           />
         </Link>
       </div>
-      <div className="flex items-space justify-between flex-auto w-64 mr-8">
+      <div className="flex items-space justify-between flex-auto w-64 ">
         <Link href="/">DashBoard</Link>
         <Link href="/start">Start a session </Link>
         <Link href="/routines">Routines</Link>

@@ -1,117 +1,67 @@
 "use client";
 
 // Lifts.js
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ExerciseForm from "./ExerciseForm";
 import DataTable from "./DataTable";
-import columns from "./Columns";
-import { LiftsForm } from "./LiftsForm";
-import FormPractice from "./FormPractice";
 import DataResponse from "./DataResponse";
+import { Card } from "@/components/ui/card";
+// import ComposableForm from "./ComposableForm";
 
 const Lifts = () => {
   const [lifts, setLifts] = useState([]);
   const [muscleType, setMuscleType] = useState("");
+  const [name, setName] = useState("");
+  const [exercise, setExercise] = useState("");
+  const [apiUrl, setApiUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const apiUrl = `https://api.api-ninjas.com/v1/exercises?muscle=${muscleType}?offset=2`;
+  // API key and base URL
+  const headers = { "X-Api-Key": process.env.NEXT_PUBLIC_API_KEY_WORKOUT };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(apiUrl, {
-          method: "GET",
-          headers: {
-            "X-Api-Key": "vjWYBohac5H2XORXnBSkjg==S4vvZl7nnLimZMaB",
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Network response was not okay: ${response.status}`);
-        }
-
-        const responseData = await response.json();
-        setLifts(responseData);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-
-    if (muscleType) {
-      fetchData();
-    }
-  }, [apiUrl, muscleType]);
-
-  const handleMuscleSelect = (selectedMuscle) => {
+  // Handle selections
+  const handleMuscleSelect = (selectedMuscle: string) => {
     setMuscleType(selectedMuscle);
   };
 
-  const muscleGroups = [
-    {
-      id: "biceps",
-      label: "Biceps",
-    },
-    {
-      id: "calves",
-      label: "Calves",
-    },
-    {
-      id: "chest",
-      label: "Chest",
-    },
-    {
-      id: "forearms",
-      label: "Forearms",
-    },
-    {
-      id: "glutes",
-      label: "Glutes",
-    },
-    {
-      id: "hamstrings",
-      label: "Hamstrings",
-    },
-    {
-      id: "lats",
-      label: "Lats",
-    },
-    {
-      id: "lower_back",
-      label: "Lower Back",
-    },
-    {
-      id: "middle_back",
-      label: "Middle Back",
-    },
-    {
-      id: "neck",
-      label: "Neck",
-    },
-    {
-      id: "quadriceps",
-      label: "Quadriceps",
-    },
-    {
-      id: "traps",
-      label: "Traps",
-    },
-    {
-      id: "triceps",
-      label: "Triceps",
-    },
-    {
-      id: "abdominals",
-      label: "Abdominals",
-    },
-  ];
+  const handleNameSelect = (selectedName: string) => {
+    setName(selectedName);
+  };
+
+  const handleExerciseSelect = (selectedExerciseType: string) => {
+    setExercise(selectedExerciseType);
+  };
+
+  // Effect to fetch data based on state changes
+  useEffect(() => {
+    // Construct the API URL with dynamic parameters
+    const queryParams = new URLSearchParams();
+    if (muscleType) queryParams.append("muscle", muscleType);
+    if (name) queryParams.append("name", name);
+    if (exercise) queryParams.append("type", exercise); // Adjust this key based on your API parameter
+
+    setApiUrl(
+      `https://api.api-ninjas.com/v1/exercises?${queryParams.toString()}&offset=2`
+    );
+  }, [muscleType, name, exercise]);
 
   return (
-    <div className="container mx-auto py-10">
-      {/* <ExerciseForm onMuscleSelect={handleMuscleSelect} /> */}
-      <LiftsForm options={muscleGroups} onMuscleSelect={handleMuscleSelect} />
-      <FormPractice />
-      <DataResponse />
-      <DataTable columns={columns} lifts={lifts} />
-    </div>
+    <Card>
+      <ExerciseForm
+        onMuscleSelect={handleMuscleSelect}
+        onName={handleNameSelect}
+        onExerciseType={handleExerciseSelect}
+        isLoading={isLoading}
+      />
+
+      <DataResponse
+        finalURL={apiUrl}
+        headers={headers}
+        onLiftsLoaded={setLifts}
+        setIsLoading={setIsLoading}
+      />
+      <DataTable lifts={lifts} />
+    </Card>
   );
 };
 

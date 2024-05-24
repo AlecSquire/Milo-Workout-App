@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-
+import { capitalize } from "@/lib/utils";
 const workoutSchema = z.object({
   description: z.string().optional(),
   workoutName: z
@@ -64,7 +64,9 @@ export default function StartBlankWorkoutForm() {
 
     try {
       // Join workoutName with hyphens between words
-      const formattedRoutineId = data.workoutName.replace(/\s+/g, "-");
+      const formattedRoutineId = data.workoutName
+        .replace(/\s+$/, "")
+        .replace(/\s+/g, "-");
 
       // Use the formatted workoutName as the document ID
       const documentId = formattedRoutineId;

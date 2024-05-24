@@ -1,8 +1,21 @@
-// ExerciseForm.js
-import React from "react";
-import { useForm } from "react-hook-form";
+"use client";
+import { useState } from "react";
+import { useForm, FormProvider, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ButtonLoading } from "@/components/ui/ButtonLoading";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -12,104 +25,135 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { toast } from "@/components/ui/use-toast";
-const muscles = [
-  {
-    id: "biceps",
-    label: "Biceps",
-  },
-  {
-    id: "calves",
-    label: "Calves",
-  },
-  {
-    id: "chest",
-    label: "Chest",
-  },
-  {
-    id: "forearms",
-    label: "Forearms",
-  },
-  {
-    id: "glutes",
-    label: "Glutes",
-  },
-  {
-    id: "hamstrings",
-    label: "Hamstrings",
-  },
-  {
-    id: "lats",
-    label: "Lats",
-  },
-  {
-    id: "lower_back",
-    label: "Lower Back",
-  },
-  {
-    id: "middle_back",
-    label: "Middle Back",
-  },
-  {
-    id: "neck",
-    label: "Neck",
-  },
-  {
-    id: "quadriceps",
-    label: "Quadriceps",
-  },
-  {
-    id: "traps",
-    label: "Traps",
-  },
-  {
-    id: "triceps",
-    label: "Triceps",
-  },
-  {
-    id: "abdominals",
-    label: "Abdominals",
-  },
-] as const;
-const ExerciseForm = ({ onMuscleSelect }) => {
-  const { register, handleSubmit, watch } = useForm();
-  const selectedMuscle = watch("selectedMuscle");
-  const form = useForm;
-  const handleFormSubmit = (data) => {
-    onMuscleSelect(data.selectedMuscle);
+
+import { muscleOptions, exerciseTypes } from "../../lib/ExerciseMappingData";
+import { FileSpreadsheetIcon } from "lucide-react";
+
+const FormSchema = z.object({
+  muscle: z.array(z.string()).optional(),
+  name: z.string().optional(),
+  exerciseType: z.string().optional(),
+});
+interface FormProps {
+  onMuscleSelect: Function;
+  onExerciseType: Function;
+  onName: Function;
+  isLoading: boolean;
+}
+interface Data {
+  muscle?: string[];
+  name?: string;
+  exerciseType?: string;
+}
+const ExerciseForm = ({
+  onMuscleSelect,
+  onName,
+  onExerciseType,
+  isLoading,
+}: FormProps) => {
+  const formMethods = useForm({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      muscle: [],
+      name: "",
+      exerciseType: "",
+    },
+  });
+
+  const { handleSubmit, control, register } = formMethods;
+
+  const onSubmit = (data: Data) => {
+    onMuscleSelect(data.muscle);
+    onName(data.name);
+    onExerciseType(data.exerciseType);
+    console.log(data);
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-8">
-        <label>
-          Pick a muscle:
-          <select
-            {...register("selectedMuscle")}
-            defaultValue={[""]}
-            multiple={true}
-          >
-            <option value="abdominals">Abdominals</option>
-            <option value="abductors">Abductors</option>
-            <option value="adductors">Adductors</option>
-            <option value="biceps">Biceps</option>
-            <option value="calves">Calves</option>
-            <option value="chest">Chest</option>
-            <option value="forearms">Forearms</option>
-            <option value="glutes">Glutes</option>
-            <option value="hamstrings">Hamstrings</option>
-            <option value="lats">Lats</option>
-            <option value="lower_back">Lower Back</option>
-            <option value="middle_back">Middle Back</option>
-            <option value="neck">Neck</option>
-            <option value="quadriceps">Quadriceps</option>
-            <option value="traps">Traps</option>
-            <option value="triceps">Triceps</option>
-          </select>
-          <Button type="submit">Submit</Button>
-        </label>
+    <FormProvider {...formMethods}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col md:flex-row md:space-x-4 px-4 py-2"
+      >
+        <FormField
+          control={control}
+          name="muscle"
+          render={() => (
+            <FormItem className="flex flex-col w-full">
+              <FormLabel className="text-base">Muscle groups</FormLabel>
+              <FormDescription>Select muscles</FormDescription>
+              <div className="mt-2">
+                {muscleOptions.map((muscle) => (
+                  <FormField
+                    key={muscle.id}
+                    control={control}
+                    name="muscle"
+                    render={({ field }) => (
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          {...field}
+                          className="h-4 w-4 text-indigo-600"
+                        />
+                        <FormLabel className="font-normal">
+                          {muscle.label}
+                        </FormLabel>
+                      </div>
+                    )}
+                  />
+                ))}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full">
+              <FormLabel className="text-base">Name of exercise</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="This value can be partial"
+                  {...field}
+                  className="mt-1"
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="exerciseType"
+          render={({ field }) => (
+            <FormItem className="flex flex-col w-full">
+              <FormLabel className="text-base">Select an option</FormLabel>
+              <FormControl>
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => field.onChange(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a type of exercise" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Exercise Type</SelectLabel>
+                      {exerciseTypes.map((exercise) => (
+                        <SelectItem key={exercise.id} value={exercise.id}>
+                          {exercise.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        {isLoading ? <ButtonLoading /> : <Button type="submit">Submit</Button>}
       </form>
-    </Form>
+    </FormProvider>
   );
 };
 

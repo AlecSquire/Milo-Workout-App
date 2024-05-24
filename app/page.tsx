@@ -13,8 +13,13 @@ import { auth } from "@/firebase/config";
 import Link from "next/link";
 import { Router } from "next/router";
 import { useRouter } from "next/navigation";
+import infoPage from "./info/page";
 
-export default function Home({ finalURL }) {
+type HomeParams = {
+  finalURL?: string | undefined;
+};
+
+export default function Home({ finalURL }: { params: HomeParams }) {
   // const [userTemplates, setUserTemplates] = useState([]);
   const [user] = useAuthState(auth);
   console.log({ user });
@@ -27,8 +32,12 @@ export default function Home({ finalURL }) {
   // const session = useSession();
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-[#f38524]">
-      <NewUserSurvey />
-
+      {/* <NewUserSurvey /> */}
+      {user ? (
+        <div> User: {user?.email} is logged </div>
+      ) : (
+        <div>no one is logged in </div>
+      )}
       <Image
         src={MiloImage}
         width={500}
@@ -40,7 +49,7 @@ export default function Home({ finalURL }) {
           href="/sign-in"
           className="text-[#f38524] bg-black p-2 border-spacing-1 m-2 rounded"
         >
-          Login in
+          Log in
         </Link>
         <Link
           href="/sign-up"
@@ -48,7 +57,7 @@ export default function Home({ finalURL }) {
         >
           Sign up
         </Link>
-        <div> {userSession?.data?.user?.name}</div>
+
         <button
           onClick={() => {
             signOut(auth);

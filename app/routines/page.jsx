@@ -24,10 +24,6 @@ const Routines = () => {
         >
           Start empty workout
         </Button>
-        {/* <CreateTemplate
-          userTemplates={userTemplates}
-          setUserTemplates={setUserTemplates}
-        /> */}
       </div>
       <div className="col-span-1">
         <h1 className="mt-4">My Templates</h1>
@@ -36,10 +32,6 @@ const Routines = () => {
           setUserTemplates={setUserTemplates}
         />
       </div>
-      {/* <div className="col-span-1">
-        <h1 className="mt-4">Pre built templates</h1>
-        <PreBuiltTemplates />
-      </div> */}
     </div>
   );
 };
