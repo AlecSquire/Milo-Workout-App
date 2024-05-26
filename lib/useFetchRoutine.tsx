@@ -25,7 +25,7 @@ const useFetchRoutine = (
   useEffect(() => {
     const fetchDocumentData = async () => {
       try {
-        const userRoutinesRef = collection(db, "userRoutines");
+        const userRoutinesRef = collection(db, "routines");
         const q = query(userRoutinesRef, where("id", "==", routineID));
         const querySnapshot = await getDocs(q);
 

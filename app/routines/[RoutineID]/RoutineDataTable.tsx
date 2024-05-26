@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import {
   Table,
@@ -8,48 +9,132 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Exercise } from "@/types";
 import { capitalize } from "@/lib/utils";
-import { IWorkout } from "@/types";
+import { FormFields, StartNewForm } from "@/types";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/firebase/config";
 
 interface Props {
-  lifts: IWorkout;
+  lifts: FormFields[];
+  routineID?: string;
 }
 
-const RoutineDataTable = ({ lifts }: Props) => {
+const RoutineDataTable = ({ lifts, routineID }: Props) => {
+  const { control, handleSubmit, register } = useForm({
+    defaultValues: {
+      lifts: lifts,
+    },
+  });
+
+  const onSubmit: SubmitHandler<{ lifts: StartNewForm[] }> = async (data) => {
+    console.log("Form Data:", data);
+
+    try {
+      const workoutName = data.lifts[0]?.workoutName;
+      console.log(workoutName);
+      // Join workoutName with hyphens between words
+      const formattedRoutineId = workoutName
+        .replace(/\s+$/, "")
+        .replace(/\s+/g, "-");
+
+      // Use the formatted workoutName as the document ID
+      const documentId = formattedRoutineId;
+
+      // Create a document reference with the generated ID
+      const docRef = doc(db, "routines", documentId);
+
+      // // Get the current date and time with seconds
+      // const currentDate = new Date();
+      // const timestamp = currentDate.toISOString();
+
+      // Set the data with the generated ID and timestamp
+      await setDoc(docRef, {
+        ...data,
+        id: documentId,
+        // timestamp: timestamp,
+      });
+      console.log("Document written with ID: ", documentId);
+      // console.log("Timestamp:", timestamp);
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
+  };
+
   return (
-    <div className="w-full mt-5">
-      <div className="rounded-md sm:border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Set</TableHead>
-              <TableHead>Previous</TableHead>
-              <TableHead>kg</TableHead>
-              <TableHead>Reps</TableHead>
-              <TableHead>Complete</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {lifts.map((lift) => (
-              <React.Fragment key={lift.id}>
-                {lift.workout.map((workoutItem, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{capitalize(workoutItem.exercise)}</TableCell>
-                    <TableCell>{workoutItem.sets}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>{workoutItem.weight}</TableCell>
-                    <TableCell>{workoutItem.reps}</TableCell>
-                    <TableCell>{workoutItem.complete ? "Yes" : "No"}</TableCell>
-                  </TableRow>
-                ))}
-              </React.Fragment>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Table>
+        <div className="w-full">
+          <div className="rounded-md sm:border">
+            {Array.isArray(lifts) &&
+              lifts.map((lift, liftIndex) => (
+                <React.Fragment key={lift.id}>
+                  {lift.workout &&
+                    lift.workout.map((workoutItem, workoutIndex) => (
+                      <React.Fragment key={workoutIndex}>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-full">
+                              {capitalize(workoutItem.exercise)}
+                            </TableHead>
+                          </TableRow>
+                          <TableRow>
+                            <TableHead>Set</TableHead>
+                            <TableHead>Previous</TableHead>
+                            <TableHead>kg</TableHead>
+                            <TableHead>Reps</TableHead>
+                            <TableHead>Complete</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {Array.from({ length: workoutItem.sets || 1 }).map(
+                            (_, setIndex) => (
+                              <TableRow key={setIndex}>
+                                <TableCell>{setIndex + 1}</TableCell>
+                                <TableCell>-</TableCell>
+                                <TableCell>
+                                  <input
+                                    type="number"
+                                    {...register(
+                                      `lifts.${liftIndex}.workout.${workoutIndex}.weight`
+                                    )}
+                                    defaultValue={workoutItem.weight || 0}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <input
+                                    type="number"
+                                    {...register(
+                                      `lifts.${liftIndex}.workout.${workoutIndex}.reps`
+                                    )}
+                                    defaultValue={workoutItem.reps || 0}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <input
+                                    type="checkbox"
+                                    {...register(
+                                      `lifts.${liftIndex}.workout.${workoutIndex}.complete`
+                                    )}
+                                    defaultChecked={
+                                      workoutItem.complete || false
+                                    }
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            )
+                          )}
+                        </TableBody>
+                      </React.Fragment>
+                    ))}
+                </React.Fragment>
+              ))}
+          </div>
+        </div>
+        <button type="submit">Save Changes</button>
+      </Table>
+    </form>
   );
 };
+
 export default RoutineDataTable;

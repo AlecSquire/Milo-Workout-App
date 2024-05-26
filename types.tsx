@@ -1,5 +1,6 @@
 export interface FormFields {
   id: string;
+  timestamp?: string;
   workoutName: string;
   description?: string;
   workout: IWorkout[]; // Array of IWorkout objects
@@ -9,20 +10,22 @@ export interface IWorkout {
   exercise: string;
   reps: number | string;
   sets: number;
-  weight: number;
-  complete: boolean;
+  weight?: number;
+  complete?: boolean;
+  previous?: string | number;
 }
 
 export type StartNewForm = {
   id: string;
+  timestamp?: string;
   workoutName: string;
   description?: string;
   workout: Array<{
     exercise: string;
-    reps: number | string;
-    sets: number;
-    weight: number;
-    complete: boolean;
+    reps?: number | string;
+    sets?: number;
+    weight?: number;
+    complete?: boolean;
   }>;
 };
 

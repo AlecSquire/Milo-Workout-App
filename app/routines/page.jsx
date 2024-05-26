@@ -19,7 +19,7 @@ const Routines = () => {
         <Button
           className="w-full mb-10"
           onClick={() => {
-            router.push("/start"); // Navigate to the new route
+            router.push("/workout-builder"); // Navigate to the new route
           }}
         >
           Start empty workout

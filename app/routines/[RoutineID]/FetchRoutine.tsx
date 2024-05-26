@@ -7,9 +7,10 @@ import {
   query,
   where,
   getDocs,
-  doc,
-  getDoc,
+  orderBy,
+  limit,
 } from "firebase/firestore";
+
 import { db } from "@/firebase/config";
 import { FormFields, StartNewForm } from "@/types";
 import { useRouter } from "next/navigation";
@@ -18,6 +19,7 @@ import RoutineDataTable from "./RoutineDataTable";
 
 interface FetchRoutineProps {
   routineID?: string;
+  TimeStamp?: string;
   setUserTemplate: React.Dispatch<React.SetStateAction<StartNewForm[]>>;
   userTemplate: StartNewForm[];
 }
@@ -27,21 +29,25 @@ const FetchRoutine: React.FC<FetchRoutineProps> = ({
   setUserTemplate,
   userTemplate,
 }) => {
-  const [lifts, setLifts] = useState<StartNewForm[]>([]);
+  const [lifts, setLifts] = useState<FormFields[]>([]);
   console.log(lifts);
 
   useEffect(() => {
     const fetchDocumentData = async () => {
       try {
-        const userRoutinesRef = collection(db, "userRoutines");
-        const snapshot = await getDocs(userRoutinesRef);
-        const routineData: StartNewForm[] = [];
+        const userRoutinesRef = collection(db, "routines");
+        const q = query(
+          userRoutinesRef,
+          where("id", "==", routineID),
+          // orderBy("timestamp", "desc"),
+          limit(1)
+        );
+        const snapshot = await getDocs(q);
+        const routineData: FormFields[] = [];
 
         snapshot.forEach((doc) => {
           const data = doc.data() as StartNewForm;
-          if (data.id === routineID) {
-            routineData.push({ id: doc.id, ...data });
-          }
+          routineData.push({ id: doc.id, ...data } as FormFields);
         });
 
         if (routineData.length > 0) {
@@ -59,7 +65,7 @@ const FetchRoutine: React.FC<FetchRoutineProps> = ({
 
   return (
     <div>
-      <RoutineDataTable lifts={lifts} />
+      <RoutineDataTable lifts={lifts} routineID={routineID} />
     </div>
   );
 };

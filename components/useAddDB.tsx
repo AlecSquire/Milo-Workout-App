@@ -4,7 +4,7 @@ import { db } from "@/firebase/config";
 
 const useAddDB = () => {
   useEffect(() => {
-    const q = query(collection(db, "userRoutines"));
+    const q = query(collection(db, "routines"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       let routinesArray: Routine[] = [];
 

@@ -15,16 +15,17 @@ export function useFetchCollectionsDb(
   setUserTemplates: (data: FormFields[]) => void
 ) {
   useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, "userRoutines"),
-      (snapshot) => {
-        const routinesArray: FormFields[] = [];
-        snapshot.forEach((doc) => {
-          routinesArray.push({ ...doc.data(), id: doc.id } as FormFields);
-        });
-        setUserTemplates(routinesArray);
-      }
-    );
+    const unsubscribe = onSnapshot(collection(db, "routines"), (snapshot) => {
+      const routinesArray: FormFields[] = [];
+      snapshot.forEach((doc) => {
+        routinesArray.push({
+          ...doc.data(),
+          id: doc.workoutName,
+        } as FormFields);
+        console.log(doc.workoutName);
+      });
+      setUserTemplates(routinesArray);
+    });
 
     return () => {
       unsubscribe();

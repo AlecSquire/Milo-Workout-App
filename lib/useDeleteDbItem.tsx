@@ -9,7 +9,7 @@ const useDeleteDbItem = async (
 ) => {
   if (routineToDelete && hasId(routineToDelete)) {
     try {
-      await deleteDoc(doc(db, "userRoutines", routineToDelete.id));
+      await deleteDoc(doc(db, "routines", routineToDelete.id));
       console.log("Document successfully deleted!");
     } catch (error) {
       console.error("Error deleting document: ", error);

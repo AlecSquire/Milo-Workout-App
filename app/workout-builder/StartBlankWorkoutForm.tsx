@@ -32,7 +32,7 @@ const workoutSchema = z.object({
         .max(50),
       reps: z.union([z.string(), z.number()]).optional(),
       sets: z.union([z.string(), z.number()]).optional(),
-      weight: z.number().optional(),
+      weight: z.union([z.string(), z.number()]).optional(),
       complete: z.boolean().default(false).optional(),
     })
   ),
@@ -58,7 +58,6 @@ export default function StartBlankWorkoutForm() {
     control,
     name: "workout",
   });
-
   const onSubmit: SubmitHandler<WorkoutFormValues> = async (data) => {
     console.log(data);
 
@@ -72,14 +71,21 @@ export default function StartBlankWorkoutForm() {
       const documentId = formattedRoutineId;
 
       // Create a document reference with the generated ID
-      const docRef = doc(db, "userRoutines", documentId);
+      const docRef = doc(db, "routines", documentId);
 
-      // Set the data with the generated ID
+      // Get the current date and time with seconds
+      // const currentDate = new Date();
+      // const timestamp = currentDate.toISOString(); // e.g., "2023-04-01T12:34:56.789Z"
+
+      // Set the data with the generated ID and timestamp
       await setDoc(docRef, {
         ...data,
         id: documentId,
+        // timestamp: timestamp,
       });
+
       console.log("Document written with ID: ", documentId);
+      // console.log(timestamp);
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -207,12 +213,12 @@ export default function StartBlankWorkoutForm() {
                 </FormItem>
               )}
             />
-
+            {/* hidden */}
             <FormField
               control={control}
               name={`workout.${index}.complete`}
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="hidden">
                   <FormLabel>Complete</FormLabel>
                   <FormControl>
                     <Input

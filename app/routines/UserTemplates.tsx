@@ -49,7 +49,7 @@ const UserTemplates = ({
     useState<SelectedRoutineType>(null);
   const [routineName, setRoutineName] = useState();
 
-  useFetchCollectionsDb(setUserTemplates);
+  useFetchCollectionsDb(setUserTemplates); // custom hook for fetch from db
 
   const hasId = (
     routine: FormFields
@@ -60,7 +60,7 @@ const UserTemplates = ({
   const deleteItem = async () => {
     if (routineToDelete && hasId(routineToDelete)) {
       try {
-        await deleteDoc(doc(db, "userRoutines", routineToDelete.id));
+        await deleteDoc(doc(db, "routines", routineToDelete.id));
         console.log("Document successfully deleted!");
       } catch (error) {
         console.error("Error deleting document: ", error);

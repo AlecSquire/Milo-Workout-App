@@ -1,42 +1,46 @@
 "use client";
+
 import MiloImage from "../public/Milo2.png";
 import Image from "next/image";
-import React, { useEffect, useState, useContext } from "react";
-import FormPractice from "./lifts/FormPractice";
-import { Button } from "@/components/ui/button";
-import DataResponse from "./lifts/DataResponse";
-import NewUserSurvey from "./NewUserSurvey";
-// import firebase from "@/firebase";
-import { signOut, useSession } from "next-auth/react";
+import React, { useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/config";
 import Link from "next/link";
-import { Router } from "next/router";
 import { useRouter } from "next/navigation";
-import infoPage from "./info/page";
+import { signOut } from "firebase/auth";
 
 type HomeParams = {
   finalURL?: string | undefined;
 };
 
-export default function Home({ finalURL }: { params: HomeParams }) {
-  // const [userTemplates, setUserTemplates] = useState([]);
-  const [user] = useAuthState(auth);
-  console.log({ user });
-  console.log(finalURL);
-  const userSession = sessionStorage.getItem("user");
+export default function Home({ params }: { params: HomeParams }) {
+  const [user, loading, error] = useAuthState(auth);
   const router = useRouter();
-  if (!user && !userSession) {
+
+  useEffect(() => {
+    if (!user && !loading) {
+      router.push("/sign-in");
+    } else if (user) {
+      sessionStorage.setItem("user", JSON.stringify(user));
+    }
+  }, [user, loading, router]);
+
+  const handleLogout = async () => {
+    await signOut(auth);
+    sessionStorage.removeItem("user");
     router.push("/sign-in");
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
-  // const session = useSession();
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-[#f38524]">
-      {/* <NewUserSurvey /> */}
       {user ? (
-        <div> User: {user?.email} is logged </div>
+        <div> User: {user.email} is logged in </div>
       ) : (
-        <div>no one is logged in </div>
+        <div>No one is logged in</div>
       )}
       <Image
         src={MiloImage}
@@ -57,12 +61,9 @@ export default function Home({ finalURL }: { params: HomeParams }) {
         >
           Sign up
         </Link>
-
         <button
-          onClick={() => {
-            signOut(auth);
-            sessionStorage.removeItem("user");
-          }}
+          onClick={handleLogout}
+          className="text-[#f38524] bg-black p-2 border-spacing-1 m-2 rounded"
         >
           Logout
         </button>

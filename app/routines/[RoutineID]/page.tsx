@@ -3,7 +3,6 @@ import FetchRoutine from "./FetchRoutine";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { FormFields, StartNewForm } from "@/types";
-import { RoutineDataTable } from "./RoutineDataTable";
 
 const UserRoutine = ({ params }: { params: { RoutineID: string } }) => {
   const [userTemplate, setUserTemplate] = useState<StartNewForm[]>([]);

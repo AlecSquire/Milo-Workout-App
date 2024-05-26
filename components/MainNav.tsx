@@ -3,7 +3,6 @@ import Link from "next/link";
 import React from "react";
 import { ModeToggle } from "./ModeToggle";
 import Image from "next/image";
-import styles from "@/globals.css";
 
 const MainNav = () => {
   return (
@@ -19,12 +18,11 @@ const MainNav = () => {
           />
         </Link>
       </div>
-      <div className="flex items-space justify-between flex-auto w-64 ">
+      <div className="flex items-space justify-between flex-auto w-max ">
         <Link href="/">DashBoard</Link>
-        <Link href="/start">Start a session </Link>
-        <Link href="/routines">Routines</Link>
-        <Link href="/lifts">Lookup Lifts </Link>
-        <Link href="./info">Info</Link>
+        <Link href="/workout-builder">Build a workout </Link>
+        <Link href="/routines">My workout routines</Link>
+        <Link href="/look-up-lifts">Lookup Lifts</Link>
       </div>
       <div className="flex flex-auto w-32 justify-around">
         <ModeToggle />
