@@ -1,34 +1,27 @@
-import {
-  collection,
-  getDoc,
-  addDoc,
-  query,
-  onSnapshot,
-} from "firebase/firestore";
+// useFetchCollectionsDb.js
+import { useEffect } from "react";
+import { collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase/config";
-
 import { FormFields } from "@/types";
 
-import { useEffect } from "react";
-
-export function useFetchCollectionsDb(
-  setUserTemplates: (data: FormFields[]) => void
-) {
+export function useFetchCollectionsDb(setUserTemplates: unknown) {
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "routines"), (snapshot) => {
-      const routinesArray: FormFields[] = [];
-      snapshot.forEach((doc) => {
-        routinesArray.push({
+    const unsubscribe = onSnapshot(
+      collection(db, "routines"),
+      (snapshot) => {
+        const routinesArray = snapshot.docs.map((doc) => ({
+          id: doc.id, // Ensure ID is included
           ...doc.data(),
-          id: doc.workoutName,
-        } as FormFields);
-        console.log(doc.workoutName);
-      });
-      setUserTemplates(routinesArray);
-    });
+        }));
+        setUserTemplates(routinesArray);
+      },
+      (error) => {
+        console.error("Error fetching routines: ", error);
+      }
+    );
 
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [setUserTemplates]);
 }

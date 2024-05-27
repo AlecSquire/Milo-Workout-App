@@ -1,6 +1,5 @@
 "use client";
 import RoutineLink from "@/components/RoutineLink";
-
 import { useEffect, useState, FormEvent } from "react";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
@@ -13,41 +12,24 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
-import {
-  collection,
-  getDoc,
-  addDoc,
-  query,
-  onSnapshot,
-} from "firebase/firestore";
-import { db } from "@/firebase/config";
 import { doc, deleteDoc } from "firebase/firestore";
+import { db } from "@/firebase/config";
 import DropDown from "./DropDown";
 import { Trash } from "lucide-react";
-import { IWorkout, FormFields } from "@/types";
+import { FormFields } from "@/types";
 import { useFetchCollectionsDb } from "@/lib/useFetchCollectionsDb";
 
-interface UserTemplatesProps {
-  userTemplates: FormFields[];
-  setUserTemplates: React.Dispatch<React.SetStateAction<FormFields[]>>;
-}
 type SelectedRoutineType = number | null;
 
-const UserTemplates = ({
-  userTemplates,
-  setUserTemplates,
-}: UserTemplatesProps) => {
-  const router = useRouter();
+const UserTemplates = () => {
+  const [userTemplates, setUserTemplates] = useState<FormFields[]>([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [routineToDelete, setRoutineToDelete] = useState<FormFields | null>(
     null
   );
   const [selectedRoutineIndex, setSelectedRoutineIndex] =
     useState<SelectedRoutineType>(null);
-  const [routineName, setRoutineName] = useState();
 
   useFetchCollectionsDb(setUserTemplates); // custom hook for fetch from db
 
@@ -73,7 +55,7 @@ const UserTemplates = ({
   const handleRoutineClick = (index: number) => {
     setSelectedRoutineIndex(index);
   };
-  console.log(userTemplates);
+
   return (
     <>
       <Card style={{ height: "70vh", overflowY: "auto" }}>

@@ -29,10 +29,14 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
 
   const onSubmit: SubmitHandler<{ lifts: StartNewForm[] }> = async (data) => {
     console.log("Form Data:", data);
-
     try {
-      const workoutName = data.lifts[0]?.workoutName;
+      if (data.lifts.length === 0 || !data.lifts?.workoutName) {
+        throw new Error("Workout name is missing in the form data");
+      }
+
+      const workoutName = data.lifts;
       console.log(workoutName);
+
       // Join workoutName with hyphens between words
       const formattedRoutineId = workoutName
         .replace(/\s+$/, "")
@@ -44,20 +48,14 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
       // Create a document reference with the generated ID
       const docRef = doc(db, "routines", documentId);
 
-      // // Get the current date and time with seconds
-      // const currentDate = new Date();
-      // const timestamp = currentDate.toISOString();
-
-      // Set the data with the generated ID and timestamp
+      // Set the data with the generated ID
       await setDoc(docRef, {
         ...data,
         id: documentId,
-        // timestamp: timestamp,
       });
       console.log("Document written with ID: ", documentId);
-      // console.log("Timestamp:", timestamp);
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error adding document: ", error.message);
     }
   };
 
