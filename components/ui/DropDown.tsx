@@ -1,8 +1,6 @@
 "use client";
-
 import * as React from "react";
 import { Calendar, MoreHorizontal, Tags, Trash, User } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -36,7 +34,11 @@ const labels = [
   "strongman",
 ];
 
-export default function DropDown({ id }: any) {
+interface Props {
+  id: string | number;
+}
+
+export default function DropDown({ id }: Props) {
   const [label, setLabel] = React.useState("feature");
   const [open, setOpen] = React.useState(false);
 

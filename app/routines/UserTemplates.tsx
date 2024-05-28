@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import DropDown from "./DropDown";
+import DropDown from "../../components/ui/DropDown";
 import { Trash } from "lucide-react";
 import { FormFields } from "@/types";
 import { useFetchCollectionsDb } from "@/lib/useFetchCollectionsDb";
@@ -58,7 +58,7 @@ const UserTemplates = () => {
 
   return (
     <>
-      <Card style={{ height: "70vh", overflowY: "auto" }}>
+      <Card className="h-[70vh] overflow-y-auto">
         {userTemplates.map((routine, index) => (
           <div
             key={index}

@@ -19,8 +19,6 @@ const UserRoutine = ({ params }: { params: { RoutineID: string } }) => {
           userTemplate={userTemplate}
           setUserTemplate={setUserTemplate}
         />
-
-        {/* <RoutineDataTable lifts={lifts} /> */}
       </Card>
     </div>
   );
