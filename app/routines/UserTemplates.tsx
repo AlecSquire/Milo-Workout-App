@@ -1,8 +1,8 @@
 "use client";
+
 import RoutineLink from "@/components/RoutineLink";
-import { useEffect, useState, FormEvent } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,20 +18,20 @@ import { db } from "@/firebase/config";
 import DropDown from "../../components/ui/DropDown";
 import { Trash } from "lucide-react";
 import { FormFields } from "@/types";
-import { useFetchCollectionsDb } from "@/lib/useFetchCollectionsDb";
+import useFetchUserRoutines from "@/lib/useFetchUserRoutines";
 
 type SelectedRoutineType = number | null;
 
 const UserTemplates = () => {
-  const [userTemplates, setUserTemplates] = useState<FormFields[]>([]);
+  const [userRoutines, loading, error, setUserRoutines] =
+    useFetchUserRoutines();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [routineToDelete, setRoutineToDelete] = useState<FormFields | null>(
     null
   );
+
   const [selectedRoutineIndex, setSelectedRoutineIndex] =
     useState<SelectedRoutineType>(null);
-
-  useFetchCollectionsDb(setUserTemplates); // custom hook for fetch from db
 
   const hasId = (
     routine: FormFields
@@ -44,6 +44,10 @@ const UserTemplates = () => {
       try {
         await deleteDoc(doc(db, "routines", routineToDelete.id));
         console.log("Document successfully deleted!");
+        // Remove the deleted routine from the state
+        setUserRoutines(
+          userRoutines.filter((routine) => routine.id !== routineToDelete.id)
+        );
       } catch (error) {
         console.error("Error deleting document: ", error);
       }
@@ -56,10 +60,18 @@ const UserTemplates = () => {
     setSelectedRoutineIndex(index);
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
     <>
       <Card className="h-[70vh] overflow-y-auto">
-        {userTemplates.map((routine, index) => (
+        {userRoutines.map((routine, index) => (
           <div
             key={index}
             className="routine-item"
@@ -67,6 +79,7 @@ const UserTemplates = () => {
           >
             <h2>{routine.workoutName}</h2>
             <p>{routine.description}</p>
+            <p>UserId: {routine.userID}</p>
             <div className="flex items-center">
               <DropDown id={routine.id} />
               <Trash
@@ -103,12 +116,12 @@ const UserTemplates = () => {
         <AlertDialog open={selectedRoutineIndex !== null}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <h2>{userTemplates[selectedRoutineIndex]?.workoutName}</h2>
-              <p>{userTemplates[selectedRoutineIndex]?.description}</p>
+              <h2>{userRoutines[selectedRoutineIndex]?.workoutName}</h2>
+              <p>{userRoutines[selectedRoutineIndex]?.description}</p>
             </AlertDialogHeader>
             <AlertDialogDescription>
               <div className="routine-details">
-                {userTemplates[selectedRoutineIndex].workout?.map(
+                {userRoutines[selectedRoutineIndex].workout?.map(
                   (workout, index) => (
                     <div key={index} className="workout-item">
                       <p>Exercise: {workout.exercise}</p>
@@ -126,9 +139,8 @@ const UserTemplates = () => {
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction>
-                {" "}
                 <RoutineLink
-                  routineId={userTemplates[selectedRoutineIndex].workoutName}
+                  routineId={userRoutines[selectedRoutineIndex].workoutName}
                 />
               </AlertDialogAction>
             </AlertDialogFooter>

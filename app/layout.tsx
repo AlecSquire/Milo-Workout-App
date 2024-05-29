@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/Theme-provider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -40,7 +41,10 @@ export default async function RootLayout({
             <div className="max-w-6xl w-full">
               <MainNav />
               <main className="flex flex-col items-center">
-                <div className="max-w-6xl w-full">{children}</div>
+                <div className="max-w-6xl w-full">
+                  {children}
+                  <Toaster />
+                </div>
               </main>
             </div>
           </nav>

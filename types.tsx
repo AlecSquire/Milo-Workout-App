@@ -1,5 +1,6 @@
 export interface FormFields {
   id: string;
+  userID: string;
   timestamp?: string;
   workoutName: string;
   description?: string;
@@ -17,6 +18,7 @@ export interface IWorkout {
 
 export type StartNewForm = {
   id: string;
+  userID: string;
   timestamp?: string;
   workoutName: string;
   description?: string;

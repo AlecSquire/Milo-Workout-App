@@ -5,6 +5,7 @@ import { db } from "@/firebase/config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Form,
   FormControl,
@@ -16,6 +17,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { capitalize } from "@/lib/utils";
+import { getAuth } from "firebase/auth";
+
 const workoutSchema = z.object({
   description: z.string().optional(),
   workoutName: z
@@ -31,7 +34,12 @@ const workoutSchema = z.object({
         })
         .max(50),
       reps: z.union([z.string(), z.number()]).optional(),
-      sets: z.union([z.string(), z.number()]).optional(),
+      sets: z
+        .string()
+        .min(2, {
+          message: "no more than 50 sets (you animal ;) )",
+        })
+        .max(50),
       weight: z.union([z.string(), z.number()]).optional(),
       complete: z.boolean().default(false).optional(),
     })
@@ -58,35 +66,51 @@ export default function StartBlankWorkoutForm() {
     control,
     name: "workout",
   });
-  const onSubmit: SubmitHandler<WorkoutFormValues> = async (data) => {
-    console.log(data);
+  const { toast } = useToast();
 
+  const onSubmit: SubmitHandler<WorkoutFormValues> = async (data) => {
     try {
-      // Join workoutName with hyphens between words
+      // Get the current authenticated user
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        throw new Error("No user is signed in.");
+      }
+
+      // Get the user's unique ID (UID)
+      const userID = user.uid;
+
+      // Format the workout name to be used as a document ID
       const formattedRoutineId = data.workoutName
         .replace(/\s+$/, "")
         .replace(/\s+/g, "-");
 
-      // Use the formatted workoutName as the document ID
-      const documentId = formattedRoutineId;
-
       // Create a document reference with the generated ID
-      const docRef = doc(db, "routines", documentId);
+      const docRef = doc(db, "routines", formattedRoutineId);
 
-      // Get the current date and time with seconds
-      // const currentDate = new Date();
-      // const timestamp = currentDate.toISOString(); // e.g., "2023-04-01T12:34:56.789Z"
-
-      // Set the data with the generated ID and timestamp
+      // Set the data with the generated ID and include the user ID
       await setDoc(docRef, {
         ...data,
-        id: documentId,
-        // timestamp: timestamp,
+        userID: userID, // Include the user ID
+        id: formattedRoutineId,
       });
 
-      console.log("Document written with ID: ", documentId);
-      // console.log(timestamp);
+      // Display success toast
+      toast({
+        title: "Success",
+        description: `Document written with ID: ${formattedRoutineId}`,
+        status: "success",
+      });
+
+      console.log("Document written with ID: ", formattedRoutineId);
     } catch (error) {
+      // Display error toast
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+      });
       console.error("Error adding document: ", error);
     }
   };
@@ -224,7 +248,8 @@ export default function StartBlankWorkoutForm() {
                     <Input
                       type="checkbox"
                       {...register(`workout.${index}.complete` as const)}
-                      {...field}
+                      checked={field.value}
+                      onChange={(event) => field.onChange(event.target.checked)}
                     />
                   </FormControl>
                 </FormItem>
@@ -239,17 +264,17 @@ export default function StartBlankWorkoutForm() {
 
         <Button
           type="button"
-          onClick={() =>
+          onClick={() => {
             append({
               exercise: "",
               reps: 0,
               sets: 0,
               weight: 0,
               complete: false,
-            })
-          }
+            });
+          }}
         >
-          Add exercise
+          Add Exercise
         </Button>
 
         <Button type="submit">Finish workout</Button>

@@ -1,27 +1,52 @@
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import { getAuth } from "firebase/auth";
 import { db } from "@/firebase/config";
+import { FormFields } from "@/types";
+import { useState, useEffect } from "react";
 
-const useFetchUserRoutines = async () => {
-  const auth = getAuth();
-  const user = auth.currentUser;
+// Custom hook to fetch user-specific routines
+const useFetchUserRoutines = (): [
+  FormFields[],
+  boolean,
+  any,
+  React.Dispatch<React.SetStateAction<FormFields[]>>
+] => {
+  const [userRoutines, setUserRoutines] = useState<FormFields[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<any>(null);
 
-  if (!user) {
-    console.error("No user is signed in.");
-    return [];
-  }
+  useEffect(() => {
+    const fetchRoutines = async () => {
+      try {
+        const auth = getAuth();
+        const user = auth.currentUser;
 
-  const userID = user.uid;
-  const routinesRef = collection(db, "routines");
+        if (!user) {
+          throw new Error("No user is signed in.");
+        }
 
-  // Query to fetch routines specific to the logged-in user
-  const q = query(routinesRef, where("userID", "==", userID));
-  const querySnapshot = await getDocs(q);
+        const userID = user.uid;
+        const routinesRef = collection(db, "routines");
+        const q = query(routinesRef, where("userID", "==", userID));
+        const querySnapshot = await getDocs(q);
 
-  const userRoutines = [];
-  querySnapshot.forEach((doc) => {
-    userRoutines.push({ id: doc.id, ...doc.data() });
-  });
+        const fetchedRoutines: FormFields[] = [];
+        querySnapshot.forEach((doc) => {
+          fetchedRoutines.push({ id: doc.id, ...doc.data() } as FormFields);
+        });
 
-  return userRoutines;
+        setUserRoutines(fetchedRoutines);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRoutines();
+  }, []);
+
+  return [userRoutines, loading, error, setUserRoutines];
 };
+
+export default useFetchUserRoutines;

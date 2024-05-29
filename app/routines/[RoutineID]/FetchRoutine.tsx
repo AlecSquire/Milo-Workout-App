@@ -46,8 +46,8 @@ const FetchRoutine: React.FC<FetchRoutineProps> = ({
         const routineData: FormFields[] = [];
 
         snapshot.forEach((doc) => {
-          const data = doc.data() as StartNewForm;
-          routineData.push({ id: doc.id, ...data } as FormFields);
+          const data = doc.data() as any;
+          routineData.push({ id: doc.id, ...data });
         });
 
         if (routineData.length > 0) {

@@ -4,7 +4,7 @@ import { collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { FormFields } from "@/types";
 
-export function useFetchCollectionsDb(setUserTemplates: unknown) {
+export function useFetchCollectionsDb(setUserTemplates: Function) {
   useEffect(() => {
     const unsubscribe = onSnapshot(
       collection(db, "routines"),

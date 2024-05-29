@@ -8,15 +8,7 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { db } from "@/firebase/config";
-
-interface FormFields {
-  id: string;
-  // Define other properties of FormFields interface here
-}
-
-interface StartNewForm {
-  // Define properties of StartNewForm interface here
-}
+import { FormFields, StartNewForm } from "@/types";
 
 const useFetchRoutine = (
   routineID: string,
@@ -33,7 +25,7 @@ const useFetchRoutine = (
 
         querySnapshot.forEach((doc) => {
           const data = doc.data() as FormFields;
-          routineData.push({ id: doc.id, ...data });
+          routineData.push({ id: doc.id, ...data } as const);
         });
 
         if (routineData.length > 0) {

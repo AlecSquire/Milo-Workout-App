@@ -15,9 +15,11 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { getAuth } from "firebase/auth";
 
 interface Props {
-  lifts: FormFields[];
+  lifts: StartNewForm[];
   routineID?: string;
 }
 type CheckboxStates = {
@@ -28,9 +30,10 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
   const [checkboxStates, setCheckboxStates] = useState<CheckboxStates>({});
   const { control, handleSubmit, register } = useForm({
     defaultValues: {
-      lifts: lifts,
+      workout: lifts,
     },
   });
+  const { toast } = useToast();
 
   const handleCheckboxChange = (rowId: string) => {
     setCheckboxStates((prevState) => ({
@@ -38,41 +41,48 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
       [rowId]: !prevState[rowId],
     }));
   };
+
   const onSubmit: SubmitHandler<{ lifts: StartNewForm[] }> = async (data) => {
     console.log("Form Data:", data);
     try {
+      // Get the current authenticated user
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("No user is signed in.");
+      }
+      // Get the user's unique ID (UID)
+      const userID = user.uid;
+
       if (data.lifts.length === 0) {
         throw new Error("No lifts provided in the form data");
       }
 
-      const workoutName = lifts[0].workoutName;
-      if (!workoutName) {
-        throw new Error("Workout name is missing in the form data");
-      }
-
-      console.log(workoutName);
-
-      // Join workoutName with hyphens between words
-      const formattedRoutineId = workoutName
-        .replace(/\s+$/, "")
-        .replace(/\s+/g, "-");
-
       // Use the formatted workoutName as the document ID
-      const documentId = formattedRoutineId;
-
-      // Create a document reference with the generated ID
+      const documentId = routineID;
       const docRef = doc(db, "routines", documentId);
 
       // Set the data with the generated ID
+
       await setDoc(docRef, {
-        ...data,
+        userID: userID, // Include the user ID
         id: documentId,
+        ...data,
+      });
+      toast({
+        title: `You updated ${routineID}`,
+        description: `with ${data.lifts[0]?.workout}`,
       });
       console.log("Document written with ID: ", documentId);
     } catch (error) {
+      toast({
+        title: `Error updating ${routineID}`,
+        description: `with ${data}`,
+      });
       console.error("Error adding document: ", error);
     }
   };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Table>
@@ -117,7 +127,7 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
                                     <input
                                       type="number"
                                       {...register(
-                                        `lifts.${liftIndex}.workout.${workoutIndex}.weight`
+                                        `workout.${liftIndex}.workout.${workoutIndex}.weight`
                                       )}
                                       defaultValue={workoutItem.weight || 0}
                                     />
@@ -126,7 +136,7 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
                                     <input
                                       type="number"
                                       {...register(
-                                        `lifts.${liftIndex}.workout.${workoutIndex}.reps`
+                                        `workout.${liftIndex}.workout.${workoutIndex}.reps`
                                       )}
                                       defaultValue={workoutItem.reps || 0}
                                     />
@@ -138,7 +148,7 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
                                       }
                                       type="checkbox"
                                       {...register(
-                                        `lifts.${liftIndex}.workout.${workoutIndex}.complete`
+                                        `workout.${liftIndex}.workout.${workoutIndex}.complete`
                                       )}
                                       defaultChecked={
                                         workoutItem.complete || false
