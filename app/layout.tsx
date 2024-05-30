@@ -8,8 +8,6 @@ import MainNav from "@/components/MainNav";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
 import { SessionProvider } from "next-auth/react";
-import SignIn from "./sign-in/page";
-import SignUp from "./sign-up/page";
 import Home from "./page";
 // import { ContextProvider } from "@/context/ContextProvider";
 const inter = Inter({ subsets: ["latin"] });
@@ -27,9 +25,6 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        {/* <SessionProvider session={session}>
-          {!session ? <SignIn /> : <SignUp />} */}
-
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -48,7 +43,7 @@ export default async function RootLayout({
               </main>
             </div>
           </nav>
-          {/* <ChatBot /> */}
+
           {/* </ContextProvider> */}
         </ThemeProvider>
         {/* </SessionProvider> */}

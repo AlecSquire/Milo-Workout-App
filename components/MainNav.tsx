@@ -26,7 +26,7 @@ const MainNav = () => {
       </div>
       <div className="flex flex-auto w-32 justify-around">
         <ModeToggle />
-        <Link href="/sign-in">
+        <Link href="/Authentication">
           <User>User</User>
         </Link>
       </div>

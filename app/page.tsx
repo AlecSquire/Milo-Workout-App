@@ -1,5 +1,4 @@
 "use client";
-
 import MiloImage from "../public/Milo2.png";
 import Image from "next/image";
 import React, { useEffect } from "react";
@@ -19,7 +18,7 @@ export default function Home({ params }: { params: HomeParams }) {
 
   useEffect(() => {
     if (!user && !loading) {
-      router.push("/sign-in");
+      router.push("/Authentication");
     } else if (user) {
       sessionStorage.setItem("user", JSON.stringify(user));
     }
@@ -28,7 +27,7 @@ export default function Home({ params }: { params: HomeParams }) {
   const handleLogout = async () => {
     await signOut(auth);
     sessionStorage.removeItem("user");
-    router.push("/sign-in");
+    router.push("/Authentication");
   };
 
   if (loading) {

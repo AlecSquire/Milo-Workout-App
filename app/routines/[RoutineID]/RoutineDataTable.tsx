@@ -42,7 +42,7 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
     }));
   };
 
-  const onSubmit: SubmitHandler<{ lifts: StartNewForm[] }> = async (data) => {
+  const onSubmit: SubmitHandler<{ workout: StartNewForm[] }> = async (data) => {
     console.log("Form Data:", data);
     try {
       // Get the current authenticated user
@@ -54,12 +54,16 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
       // Get the user's unique ID (UID)
       const userID = user.uid;
 
-      if (data.lifts.length === 0) {
+      if (data.workout.length === 0) {
         throw new Error("No lifts provided in the form data");
       }
 
       // Use the formatted workoutName as the document ID
+      if (!routineID) {
+        throw new Error("No routineID provided");
+      }
       const documentId = routineID;
+
       const docRef = doc(db, "routines", documentId);
 
       // Set the data with the generated ID
@@ -71,7 +75,7 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
       });
       toast({
         title: `You updated ${routineID}`,
-        description: `with ${data.lifts[0]?.workout}`,
+        description: `with ${data.workout[0]?.workout}`,
       });
       console.log("Document written with ID: ", documentId);
     } catch (error) {
