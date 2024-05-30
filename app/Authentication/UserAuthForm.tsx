@@ -4,14 +4,13 @@ import {
   useCreateUserWithEmailAndPassword,
 } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { auth } from "@/firebase/config";
+import { createUserDocument } from "@/lib/createUserDocument";
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/ui/Icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -19,30 +18,38 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const [createUserWithEmailAndPassword] =
     useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
-  const toast = useToast();
 
   const onSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     setIsLoading(true);
 
-    if (isSignUp) {
-      const res = await createUserWithEmailAndPassword(email, password);
-      console.log({ res });
-    } else {
-      const res = await signInWithEmailAndPassword(email, password);
-      console.log({ res });
-    }
+    try {
+      if (isSignUp) {
+        const result = await createUserWithEmailAndPassword(email, password);
 
-    sessionStorage.setItem("user", "true");
-    setEmail("");
-    setPassword("");
-    setIsLoading(false);
-    router.push("/");
+        if (result?.user) {
+          await createUserDocument(result.user, { name });
+        }
+      } else {
+        await signInWithEmailAndPassword(email, password);
+      }
+
+      sessionStorage.setItem("user", "true");
+      router.push("/");
+    } catch (error) {
+      console.error("Error during authentication", error);
+    } finally {
+      setIsLoading(false);
+      setEmail("");
+      setPassword("");
+      setName("");
+    }
   };
 
   const toggleForm = () => {
@@ -69,6 +76,24 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
               disabled={isLoading}
             />
           </div>
+          {isSignUp && (
+            <div className="grid gap-1">
+              <Label className="sr-only" htmlFor="name">
+                Display Name (this can be changed later)
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Display Name (this can be changed later)"
+                autoCapitalize="none"
+                autoComplete="name"
+                autoCorrect="off"
+                disabled={isLoading}
+              />
+            </div>
+          )}
           <div className="grid gap-1">
             <Label className="sr-only" htmlFor="password">
               Password

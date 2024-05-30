@@ -6,7 +6,6 @@ import { UserAuthForm } from "./UserAuthForm";
 import MiloImage from "@/public/Milo2.png";
 import { useToast } from "@/components/ui/use-toast";
 export default function AuthenticationPage() {
-  const toast = useToast();
   return (
     <>
       <div className="md:hidden">

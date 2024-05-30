@@ -1,7 +1,7 @@
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAnalytics, isSupported } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,6 +16,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+
 // Initialize Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
 

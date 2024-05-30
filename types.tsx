@@ -40,3 +40,39 @@ export type Exercise = {
   instructions: string;
   select?: boolean;
 };
+
+export type User = {
+  name: string;
+  email: string;
+  userID: string;
+  img: string;
+  session: Session;
+  personalBest: PersonalBest;
+  savedLifts: SavedLift[];
+};
+export type Session = {
+  sessionID: string;
+  userID: string;
+  date: string;
+  workoutName: string;
+  description: string;
+  workout: Array<IWorkout>;
+};
+export type PersonalBest = {
+  [exercise: string]: {
+    reps: string;
+    weight: string;
+  };
+};
+
+export type SavedLift = {
+  exercise: string;
+  defaultReps: string;
+  defaultSets: string;
+  defaultWeight: string;
+};
+export type Toast = {
+  title: React.ReactNode;
+  description: React.ReactNode;
+  status?: "success" | "error"; // Define the status property
+};

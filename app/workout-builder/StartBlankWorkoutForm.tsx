@@ -1,6 +1,6 @@
 "use client";
 import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -16,8 +16,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { capitalize } from "@/lib/utils";
 import { getAuth } from "firebase/auth";
+import { Toast } from "@/types";
 
 const workoutSchema = z.object({
   description: z.string().optional(),
@@ -34,25 +34,21 @@ const workoutSchema = z.object({
         })
         .max(50),
       reps: z.union([z.string(), z.number()]).optional(),
-      sets: z
-        .string()
-        .min(2, {
-          message: "no more than 50 sets (you animal ;) )",
-        })
-        .max(50),
+      sets: z.union([z.string(), z.number()]).optional(),
       weight: z.union([z.string(), z.number()]).optional(),
       complete: z.boolean().default(false).optional(),
     })
   ),
 });
-
 type WorkoutFormValues = z.infer<typeof workoutSchema>;
 
 export default function StartBlankWorkoutForm() {
   const form = useForm<WorkoutFormValues>({
     resolver: zodResolver(workoutSchema),
     defaultValues: {
-      workout: [{ exercise: "", reps: 0, sets: 0, weight: 0, complete: false }],
+      workout: [
+        { exercise: "", reps: "", sets: "", weight: "", complete: false },
+      ],
     },
   });
   const {
@@ -100,7 +96,6 @@ export default function StartBlankWorkoutForm() {
       toast({
         title: "Success",
         description: `Document written with ID: ${formattedRoutineId}`,
-        status: "success",
       });
 
       console.log("Document written with ID: ", formattedRoutineId);
@@ -108,8 +103,7 @@ export default function StartBlankWorkoutForm() {
       // Display error toast
       toast({
         title: "Error",
-        description: error.message,
-        status: "error",
+        description: `Error adding document: ${error}`,
       });
       console.error("Error adding document: ", error);
     }
@@ -198,10 +192,14 @@ export default function StartBlankWorkoutForm() {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage>
+                    {errors.workout?.[index]?.sets && (
+                      <span>{errors.workout?.[index]?.sets?.message}</span>
+                    )}
+                  </FormMessage>
                 </FormItem>
               )}
             />
-
             <FormField
               control={control}
               name={`workout.${index}.reps`}
@@ -211,10 +209,17 @@ export default function StartBlankWorkoutForm() {
                   <FormControl>
                     <Input
                       type="number"
-                      {...register(`workout.${index}.reps` as const)}
+                      {...register(`workout.${index}.reps` as const, {
+                        valueAsNumber: true,
+                      })}
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage>
+                    {errors.workout?.[index]?.reps && (
+                      <span>{errors.workout?.[index]?.reps?.message}</span>
+                    )}
+                  </FormMessage>
                 </FormItem>
               )}
             />
@@ -234,10 +239,15 @@ export default function StartBlankWorkoutForm() {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage>
+                    {errors.workout?.[index]?.weight && (
+                      <span>{errors.workout?.[index]?.weight?.message}</span>
+                    )}
+                  </FormMessage>
                 </FormItem>
               )}
             />
-            {/* hidden */}
+
             <FormField
               control={control}
               name={`workout.${index}.complete`}
@@ -267,9 +277,9 @@ export default function StartBlankWorkoutForm() {
           onClick={() => {
             append({
               exercise: "",
-              reps: 0,
+              reps: "",
               sets: 0,
-              weight: 0,
+              weight: "",
               complete: false,
             });
           }}

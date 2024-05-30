@@ -17,7 +17,7 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import DropDown from "../../components/ui/DropDown";
 import { Trash } from "lucide-react";
-import { FormFields } from "@/types";
+import { FormFields, Toast } from "@/types";
 import useFetchUserRoutines from "@/lib/useFetchUserRoutines";
 
 type SelectedRoutineType = number | null;
@@ -79,7 +79,7 @@ const UserTemplates = () => {
           >
             <h2>{routine.workoutName}</h2>
             <p>{routine.description}</p>
-            <p>UserId: {routine.userID}</p>
+            {/* <p>UserId: {routine.userID}</p> */}
             <div className="flex items-center">
               <DropDown id={routine.id} />
               <Trash
