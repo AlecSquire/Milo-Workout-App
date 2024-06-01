@@ -38,17 +38,6 @@ export default function Home({ params }: { params: HomeParams }) {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Dashboard />
-      {user ? (
-        <div> User: {user.email} is logged in </div>
-      ) : (
-        <div>No one is logged in</div>
-      )}
-      <button
-        onClick={handleLogout}
-        className="text-[#f38524] bg-black p-2 border-spacing-1 m-2 rounded"
-      >
-        Logout
-      </button>
     </main>
   );
 }

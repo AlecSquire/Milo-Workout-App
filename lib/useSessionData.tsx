@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import { Session } from "@/types"; // Ensure the import path is correct
 import { getAuth, onAuthStateChanged } from "firebase/auth";

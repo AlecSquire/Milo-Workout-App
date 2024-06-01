@@ -38,7 +38,7 @@ export default function DropDownUser() {
               width={80}
               height={80}
               alt={"logo of milo"}
-              className="rounded-full"
+              className="rounded-full hidden md:block" // Hide on small screens, show on medium and larger screens
             />
           </Button>
         </DropdownMenuTrigger>

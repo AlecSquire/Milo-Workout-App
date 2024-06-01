@@ -1,45 +1,34 @@
-import { useEffect } from "react";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { FormFields, StartNewForm } from "@/types";
+import { FormFields } from "@/types";
 
-const useFetchRoutine = (
-  routineID: string,
-  setUserTemplate: (templates: StartNewForm[]) => void
-) => {
+const useFetchRoutine = () => {
+  const [routineData, setRoutineData] = useState<FormFields[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
   useEffect(() => {
-    const fetchDocumentData = async () => {
+    const fetchRoutineData = async () => {
       try {
-        const userRoutinesRef = collection(db, "routines");
-        const q = query(userRoutinesRef, where("id", "==", routineID));
-        const querySnapshot = await getDocs(q);
-
-        const routineData: StartNewForm[] = [];
-
+        const querySnapshot = await getDocs(collection(db, "routines"));
+        const data: FormFields[] = [];
         querySnapshot.forEach((doc) => {
-          const data = doc.data() as FormFields;
-          routineData.push({ id: doc.id, ...data } as const);
+          const routine = doc.data() as FormFields;
+          data.push({ ...routine, id: doc.id } as const);
         });
-
-        if (routineData.length > 0) {
-          setUserTemplate(routineData);
-        } else {
-          console.warn(`No routines found with the workoutName: ${routineID}`);
-        }
+        setRoutineData(data);
       } catch (error) {
-        console.error("Error fetching document data:", error);
+        setError(error as Error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchDocumentData();
-  }, [routineID, setUserTemplate]);
+    fetchRoutineData();
+  }, []);
+
+  return { routineData, loading, error };
 };
 
 export default useFetchRoutine;

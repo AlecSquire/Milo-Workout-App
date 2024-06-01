@@ -26,6 +26,9 @@ const Profile = () => {
   return (
     <div>
       <div className="px-4 space-y-6 md:px-6">
+        <h1 className=" text-xl rounded-md p-15	bg-orange-500	">
+          Still Under Construction{" "}
+        </h1>
         <header className="space-y-1.5">
           <div className="flex items-center space-x-4">
             <Image

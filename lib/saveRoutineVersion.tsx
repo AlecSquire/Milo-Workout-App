@@ -26,7 +26,7 @@ const saveRoutineVersion = async (routineID: string, workout: StartNewForm) => {
 
     console.log("Routine version saved with ID: ", timestamp);
   } catch (error) {
-    console.error("Error saving routine version: ", error.message); // Enhanced error logging
+    console.log("error"); // Enhanced error logging
   }
 };
 

@@ -70,7 +70,7 @@ const UserTemplates = () => {
 
   return (
     <>
-      <Card className="h-[70vh] overflow-y-auto">
+      <Card className="h-[70vh] overflow-y-auto w-full p-16">
         {userRoutines.map((routine, index) => (
           <div
             key={index}

@@ -10,11 +10,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { capitalize } from "@/lib/utils";
-import { FormFields, IWorkout, StartNewForm } from "@/types";
+import { FormFields, Session, IWorkout } from "@/types";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import useUploadSessionData from "@/lib/useUploadSessionData";
 import { getAuth } from "firebase/auth";
+import { v4 as uuidv4 } from "uuid"; // Import uuid for unique ID generation
 
 interface Props {
   lifts: FormFields[];
@@ -24,6 +25,32 @@ interface Props {
 type CheckboxStates = {
   [key: string]: boolean;
 };
+
+// New types for transformation
+interface ConvertedExerciseDetail {
+  sets: number;
+  reps: number;
+  weight?: number;
+  complete?: boolean;
+  exercise: string;
+}
+
+interface ConvertedWorkoutDetail {
+  workout: ConvertedExerciseDetail[];
+  userID: string;
+  id: string;
+  description: string;
+  workoutName: string;
+}
+
+interface ConvertedSession {
+  description: string;
+  workoutName: string;
+  userID: string;
+  sessionID: string;
+  workout: ConvertedWorkoutDetail[];
+  date: string; // Use Date type if you plan to parse it to a Date object
+}
 
 const RoutineDataTable = ({ lifts, routineID }: Props) => {
   const [checkboxStates, setCheckboxStates] = useState<CheckboxStates>({});
@@ -64,15 +91,33 @@ const RoutineDataTable = ({ lifts, routineID }: Props) => {
       return;
     }
 
-    const sessionData = {
+    // Transform the workout data to match the ConvertedSession interface
+    const workoutDetails: ConvertedWorkoutDetail[] = data.workout.map(
+      (lift) => ({
+        workout: lift.workout.map((workoutItem) => ({
+          exercise: workoutItem.exercise,
+          sets: workoutItem.sets,
+          reps: workoutItem.reps as number,
+          weight: workoutItem.weight,
+          complete: workoutItem.complete,
+        })),
+        userID: lift.userID || user.uid,
+        id: lift.id,
+        description: lift.description || "",
+        workoutName: lift.workoutName,
+      })
+    );
+
+    const sessionData: ConvertedSession = {
+      sessionID: uuidv4(), // Generate a unique session ID
       date: new Date().toISOString(),
       userID: user.uid,
       workoutName: data.workoutName,
       description: data.description,
-      workout: data.workout,
+      workout: workoutDetails,
     };
 
-    await uploadSessionData(sessionData, routineID);
+    await uploadSessionData(sessionData as unknown as Session, routineID);
   };
 
   // Ensure lifts are set on the client side

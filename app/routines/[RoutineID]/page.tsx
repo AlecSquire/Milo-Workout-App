@@ -12,7 +12,10 @@ const UserRoutine = ({ params }: { params: { RoutineID: string } }) => {
 
   return (
     <div>
-      My Routine: {routineID}
+      <h1 className=" text-xl rounded-md p-15	bg-orange-500	">
+        Still Under Construction{" "}
+      </h1>
+      <h1>My Routine: {routineID}</h1>
       <Card style={{ height: "70vh", overflowY: "auto" }}>
         <FetchRoutine
           routineID={routineID}

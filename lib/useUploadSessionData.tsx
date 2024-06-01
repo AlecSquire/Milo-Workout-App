@@ -2,15 +2,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { getAuth } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { Sessions, IWorkout } from "@/types";
+import { Session } from "@/types";
 
 const useUploadSessionData = () => {
   const { toast } = useToast();
 
-  const uploadSessionData = async (
-    sessionData: Sessions,
-    routineID: string
-  ) => {
+  const uploadSessionData = async (sessionData: Session, routineID: string) => {
     try {
       // Get the current authenticated user
       const auth = getAuth();

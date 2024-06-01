@@ -36,6 +36,9 @@ const DashboardPage = () => {
 
   return (
     <>
+      <h1 className=" text-xl rounded-md p-2	bg-orange-500	">
+        Still Under Construction{" "}
+      </h1>
       <WorkoutHistory />
       <h1>Training History</h1>
       {/* {sessionData && (
