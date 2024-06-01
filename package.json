@@ -23,6 +23,7 @@
     "@types/firebase": "^3.2.1",
     "@types/recharts": "^1.8.29",
     "@vercel/next": "^4.2.14",
+    "@vercel/speed-insights": "^1.0.11",
     "autoprefixer": "^10.4.19",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

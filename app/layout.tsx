@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/Theme-provider";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import MainNav from "@/components/MainNav";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { SessionProvider } from "next-auth/react";
 import { AppWrapper } from "../app/context/Index";
@@ -25,25 +26,30 @@ export default function layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+        <SpeedInsights />
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
           <SessionProvider session={session}>
             <AppWrapper>
-              <nav className="flex flex-col justify-center items-center border-b">
-                <div className="max-w-6xl w-full">
-                  <MainNav />
-                  <main className="flex flex-col items-center">
-                    <div className="max-w-6xl w-full">
-                      {children}
-                      <Toaster />
+              <div className="flex justify-center">
+                <div className="transform origin-top scale-75 w-full max-w-6xl">
+                  <nav className="flex flex-col justify-center items-center border-b">
+                    <div className="w-full">
+                      <MainNav />
+                      <main className="flex flex-col items-center">
+                        <div className="w-full">
+                          {children}
+                          <Toaster />
+                        </div>
+                      </main>
                     </div>
-                  </main>
+                  </nav>
                 </div>
-              </nav>
+              </div>
             </AppWrapper>
           </SessionProvider>
         </ThemeProvider>
