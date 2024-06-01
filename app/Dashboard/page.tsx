@@ -1,7 +1,7 @@
+"use client";
 import React from "react";
-import useSessionData from "../../lib/useSessionData";
+import useSessionData from "../../lib/useSessionData"; // Ensure the import path is correct
 import WorkoutHistory from "@/components/WorkoutHistory";
-import { ExerciseDetail, WorkoutDetail, Session } from "@/types";
 import {
   LineChart,
   Line,
@@ -17,7 +17,6 @@ import {
 
 const DashboardPage = () => {
   const { sessionData, loading } = useSessionData();
-  console.log(sessionData);
 
   if (loading) {
     return <p>Loading session data...</p>;
@@ -36,45 +35,12 @@ const DashboardPage = () => {
 
   return (
     <>
-      <h1 className=" text-xl rounded-md p-2	bg-orange-500	">
-        Still Under Construction{" "}
+      <h1 className="text-xl rounded-md p-2 bg-orange-500">
+        Still Under Construction
       </h1>
       <WorkoutHistory />
       <h1>Training History</h1>
-      {/* {sessionData && (
-        <ul>
-          {sessionData.map((workout, index) => (
-            <li key={index}>
-              <p>Workout Name: {workout.workout[0].workoutName}</p>
-              <p>Description: {workout.workout[0].description}</p>
-              <p>Session Date: {new Date(workout.date).toLocaleDateString()}</p>
-              <br />
-              <ul>
-                {workout.workout[0].workout.map((exerciseDetail, idx) => (
-                  <li key={idx}>
-                    <p>
-                      Exercise {idx + 1}: {exerciseDetail.exercise}
-                    </p>
-                    <p>Sets: {exerciseDetail.sets}</p>
-                    <p>Reps: {exerciseDetail.reps}</p>
-                    <p>
-                      Weight:{" "}
-                      {exerciseDetail.weight
-                        ? exerciseDetail.weight
-                        : "Body Weight"}
-                    </p>
-                    <p>Complete: {exerciseDetail.complete ? "Yes" : "No"}</p>
-                    <br />
-                    <br />
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      )} */}
 
-      {/* Line Chart for Reps Over Time */}
       <h2>Reps Over Time</h2>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData}>
@@ -87,7 +53,6 @@ const DashboardPage = () => {
         </LineChart>
       </ResponsiveContainer>
 
-      {/* Bar Chart for Weight Lifted */}
       <h2>Weight Lifted</h2>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={chartData}>
