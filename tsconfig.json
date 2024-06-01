@@ -27,7 +27,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/routines/test.jsx",
-    "app/routines/page.jsx"
+    "app/routines/page.jsx",
+    "app/Dashboard/WorkoutSessionVisual"
   ],
   "exclude": ["node_modules"]
 }

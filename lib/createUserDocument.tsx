@@ -23,6 +23,7 @@ export const createUserDocument = async (
       img: photoURL || "",
       personalBest: {} as PersonalBest,
       savedLifts: [] as SavedLift[],
+      bio: "",
       ...additionalData,
     };
 

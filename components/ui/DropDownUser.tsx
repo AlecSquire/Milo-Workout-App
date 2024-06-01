@@ -2,6 +2,9 @@
 import * as React from "react";
 import { CameraIcon, Home, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/config";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +16,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { useAppContext } from "@/app/context/Index";
+import { signOut } from "firebase/auth";
 
 export default function DropDownUser() {
   const { userData } = useAppContext();
+  const router = useRouter();
+  const [user, loading, error] = useAuthState(auth);
+  const handleLogout = async () => {
+    await signOut(auth);
+    sessionStorage.removeItem("user");
+    router.push("/Authentication");
+  };
 
   return (
     <div className="flex w-full flex-col items-start justify-between px-4 py-3 sm:flex-row sm:items-center">
@@ -41,16 +52,16 @@ export default function DropDownUser() {
                 <div className="mr-2 h-4 w-4">{userData.email}</div>
               </DropdownMenuItem>
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/profile")}>
                 <Home className="mr-2 h-4 w-4" />
                 Profile
               </DropdownMenuItem>
               <DropdownMenuGroup>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/profile")}>
                   <CameraIcon className="mr-2 h-4 w-4" />
                   Update Profile Photo
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
                   <User className="mr-2 h-4 w-4" />
                   Log Out
                 </DropdownMenuItem>

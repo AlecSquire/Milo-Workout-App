@@ -12,6 +12,7 @@ const useUserData = () => {
     img: "",
     personalBest: {} as PersonalBest,
     savedLifts: [] as SavedLift[],
+    bio: "",
   });
 
   useEffect(() => {

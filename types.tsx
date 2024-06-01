@@ -48,6 +48,7 @@ export type User = {
   img: string;
   personalBest: PersonalBest;
   savedLifts: SavedLift[];
+  bio: string;
 };
 export interface ExerciseDetail {
   sets: string;

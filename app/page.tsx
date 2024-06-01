@@ -7,7 +7,7 @@ import { auth } from "@/firebase/config";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
-import Dashboard from "./Dashboard";
+import Dashboard from "./Dashboard/page";
 
 type HomeParams = {
   finalURL?: string | undefined;
