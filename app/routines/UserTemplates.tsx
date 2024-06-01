@@ -124,10 +124,10 @@ const UserTemplates = () => {
                 {userRoutines[selectedRoutineIndex].workout?.map(
                   (workout, index) => (
                     <div key={index} className="workout-item">
-                      <p>Exercise: {workout.exercise}</p>
-                      <p>Reps: {workout.reps}</p>
-                      <p>Sets: {workout.sets}</p>
-                      <p>Weight: {workout.weight}</p>
+                      <h3>
+                        {" "}
+                        {workout.sets} x {workout.exercise}
+                      </h3>
                       <br />
                     </div>
                   )

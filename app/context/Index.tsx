@@ -4,10 +4,10 @@ import { createContext, useContext, useState, ReactNode } from "react";
 import useUserData from "@/lib/useUserData";
 import useSessionData from "@/lib/useSessionData";
 interface UserContext {
-  userData: User;
-  setUserData: React.Dispatch<React.SetStateAction<User>>;
-  sessionData: Session;
-  setSessionData: React.Dispatch<React.SetStateAction<Session>>;
+  userData: User | null;
+  setUserData: React.Dispatch<React.SetStateAction<User | null>>;
+  sessionData: Session[] | null;
+  setSessionData: React.Dispatch<React.SetStateAction<Session[] | null>>;
 }
 
 const AppContext = createContext<UserContext | undefined>(undefined);

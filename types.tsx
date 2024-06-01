@@ -1,6 +1,6 @@
 export interface FormFields {
   id: string;
-  userID: string;
+  userID?: string;
   timestamp?: string;
   workoutName: string;
   description?: string;
@@ -18,7 +18,7 @@ export interface IWorkout {
 
 export type StartNewForm = {
   id: string;
-  userID: string;
+  userID?: string;
   timestamp?: string;
   workoutName: string;
   description?: string;
@@ -46,18 +46,35 @@ export type User = {
   email: string;
   userID: string;
   img: string;
-  session: Session;
   personalBest: PersonalBest;
   savedLifts: SavedLift[];
 };
-export type Session = {
-  sessionID: string;
+export interface ExerciseDetail {
+  sets: string;
+  reps: string;
+  weight: string;
+  complete: boolean;
+  exercise: string;
+}
+
+// Define the structure of a workout, which includes an array of exercises
+export interface WorkoutDetail {
+  workout: ExerciseDetail[];
   userID: string;
-  date: string;
-  workoutName: string;
+  id: string;
   description: string;
-  workout: Array<IWorkout>;
-};
+  workoutName: string;
+}
+
+// Define the structure of a session, which includes an array of workouts
+export interface Session {
+  description: string;
+  workoutName: string;
+  userID: string;
+  sessionID: string;
+  workout: WorkoutDetail[];
+  date: string; // Use Date type if you plan to parse it to a Date object
+}
 export type PersonalBest = {
   [exercise: string]: {
     reps: string;

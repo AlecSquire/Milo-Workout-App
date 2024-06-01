@@ -21,7 +21,6 @@ export const createUserDocument = async (
       email: email || "",
       userID: user.uid,
       img: photoURL || "",
-      session: {} as Session, // Corrected the field name to plural
       personalBest: {} as PersonalBest,
       savedLifts: [] as SavedLift[],
       ...additionalData,

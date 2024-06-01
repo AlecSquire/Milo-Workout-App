@@ -7,6 +7,7 @@ import { auth } from "@/firebase/config";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
+import Dashboard from "./Dashboard";
 
 type HomeParams = {
   finalURL?: string | undefined;
@@ -36,6 +37,7 @@ export default function Home({ params }: { params: HomeParams }) {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <Dashboard />
       {user ? (
         <div> User: {user.email} is logged in </div>
       ) : (

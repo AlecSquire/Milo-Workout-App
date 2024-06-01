@@ -1,5 +1,10 @@
 "use client";
-import { useForm, SubmitHandler, useFieldArray } from "react-hook-form";
+import {
+  useForm,
+  SubmitHandler,
+  useFieldArray,
+  Controller,
+} from "react-hook-form";
 import { setDoc, doc } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,7 +22,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { getAuth } from "firebase/auth";
-import { Toast } from "@/types";
+import { useState } from "react";
+import { Description } from "@radix-ui/react-toast";
 
 const workoutSchema = z.object({
   description: z.string().optional(),
@@ -33,21 +39,28 @@ const workoutSchema = z.object({
           message: "You need to name your exercise, between 2-50 characters.",
         })
         .max(50),
-      reps: z.union([z.string(), z.number()]).optional(),
       sets: z.union([z.string(), z.number()]).optional(),
-      weight: z.union([z.string(), z.number()]).optional(),
-      complete: z.boolean().default(false).optional(),
+      set: z.array(
+        z.object({
+          reps: z.union([z.string(), z.number()]),
+          weight: z.union([z.string(), z.number()]),
+        })
+      ),
     })
   ),
 });
 type WorkoutFormValues = z.infer<typeof workoutSchema>;
 
 export default function StartBlankWorkoutForm() {
+  const [submitting, IsSubmitting] = useState(false);
   const form = useForm<WorkoutFormValues>({
     resolver: zodResolver(workoutSchema),
     defaultValues: {
       workout: [
-        { exercise: "", reps: "", sets: "", weight: "", complete: false },
+        {
+          exercise: "",
+          set: [{ reps: "", weight: "" }],
+        },
       ],
     },
   });
@@ -55,6 +68,8 @@ export default function StartBlankWorkoutForm() {
     register,
     handleSubmit,
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = form;
 
@@ -85,12 +100,20 @@ export default function StartBlankWorkoutForm() {
       // Create a document reference with the generated ID
       const docRef = doc(db, "routines", formattedRoutineId);
 
-      // Set the data with the generated ID and include the user ID
-      await setDoc(docRef, {
+      // Update the data to include the number of sets for each exercise
+      const updatedData = {
         ...data,
+        description: data.description || "",
+        workout: data.workout.map((exercise) => ({
+          ...exercise,
+          sets: exercise.set.length,
+        })),
         userID: userID, // Include the user ID
         id: formattedRoutineId,
-      });
+      };
+
+      // Set the data with the generated ID and include the user ID
+      await setDoc(docRef, updatedData);
 
       // Display success toast
       toast({
@@ -108,6 +131,8 @@ export default function StartBlankWorkoutForm() {
       console.error("Error adding document: ", error);
     }
   };
+
+  const workout = watch("workout");
 
   return (
     <Form {...form}>
@@ -153,24 +178,28 @@ export default function StartBlankWorkoutForm() {
           )}
         />
 
-        {fields.map((field, index) => (
+        {fields.map((field, exerciseIndex) => (
           <section key={field.id} className="space-y-4">
             <FormField
               control={control}
-              name={`workout.${index}.exercise`}
+              name={`workout.${exerciseIndex}.exercise`}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Exercise Name</FormLabel>
                   <FormControl>
                     <Input
                       type="text"
-                      {...register(`workout.${index}.exercise` as const)}
+                      {...register(
+                        `workout.${exerciseIndex}.exercise` as const
+                      )}
                       {...field}
                     />
                   </FormControl>
                   <FormMessage>
-                    {errors.workout?.[index]?.exercise && (
-                      <span>{errors.workout?.[index]?.exercise?.message}</span>
+                    {errors.workout?.[exerciseIndex]?.exercise && (
+                      <span>
+                        {errors.workout?.[exerciseIndex]?.exercise?.message}
+                      </span>
                     )}
                   </FormMessage>
                 </FormItem>
@@ -179,94 +208,140 @@ export default function StartBlankWorkoutForm() {
 
             <FormField
               control={control}
-              name={`workout.${index}.sets`}
+              name={`workout.${exerciseIndex}.sets`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Add Sets</FormLabel>
+                  <FormLabel>Number of Sets</FormLabel>
                   <FormControl>
                     <Input
+                      className="hidden"
                       type="number"
-                      {...register(`workout.${index}.sets` as const, {
-                        valueAsNumber: true,
-                      })}
+                      {...register(`workout.${exerciseIndex}.sets` as const)}
+                      readOnly
                       {...field}
                     />
                   </FormControl>
                   <FormMessage>
-                    {errors.workout?.[index]?.sets && (
-                      <span>{errors.workout?.[index]?.sets?.message}</span>
-                    )}
-                  </FormMessage>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name={`workout.${index}.reps`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Add Reps</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...register(`workout.${index}.reps` as const, {
-                        valueAsNumber: true,
-                      })}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage>
-                    {errors.workout?.[index]?.reps && (
-                      <span>{errors.workout?.[index]?.reps?.message}</span>
+                    {errors.workout?.[exerciseIndex]?.sets && (
+                      <span>
+                        {errors.workout?.[exerciseIndex]?.sets?.message}
+                      </span>
                     )}
                   </FormMessage>
                 </FormItem>
               )}
             />
 
-            <FormField
+            <Controller
               control={control}
-              name={`workout.${index}.weight`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Add Weight</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...register(`workout.${index}.weight` as const, {
-                        valueAsNumber: true,
-                      })}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage>
-                    {errors.workout?.[index]?.weight && (
-                      <span>{errors.workout?.[index]?.weight?.message}</span>
-                    )}
-                  </FormMessage>
-                </FormItem>
+              name={`workout.${exerciseIndex}.set`}
+              render={({ field: { value, onChange } }) => (
+                <>
+                  {value.map((set, setIndex) => (
+                    <div key={setIndex} className="mb-4">
+                      <FormLabel>Set {setIndex + 1}</FormLabel>
+                      <FormField
+                        control={control}
+                        name={`workout.${exerciseIndex}.set.${setIndex}.reps`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Reps</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder={
+                                  (value[setIndex - 1]?.reps as string) || ""
+                                }
+                                {...register(
+                                  `workout.${exerciseIndex}.set.${setIndex}.reps` as const,
+                                  { valueAsNumber: true }
+                                )}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage>
+                              {errors.workout?.[exerciseIndex]?.set?.[setIndex]
+                                ?.reps && (
+                                <span>
+                                  {
+                                    errors.workout?.[exerciseIndex]?.set?.[
+                                      setIndex
+                                    ]?.reps?.message
+                                  }
+                                </span>
+                              )}
+                            </FormMessage>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={control}
+                        name={`workout.${exerciseIndex}.set.${setIndex}.weight`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Weight</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder={
+                                  (value[setIndex - 1]?.weight as string) || ""
+                                }
+                                {...register(
+                                  `workout.${exerciseIndex}.set.${setIndex}.weight` as const,
+                                  { valueAsNumber: true }
+                                )}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage>
+                              {errors.workout?.[exerciseIndex]?.set?.[setIndex]
+                                ?.weight && (
+                                <span>
+                                  {
+                                    errors.workout?.[exerciseIndex]?.set?.[
+                                      setIndex
+                                    ]?.weight?.message
+                                  }
+                                </span>
+                              )}
+                            </FormMessage>
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          const newSets = value.filter(
+                            (_, i) => i !== setIndex
+                          );
+                          onChange(newSets);
+                        }}
+                      >
+                        Remove set
+                      </Button>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      const lastSet = value[value.length - 1] || {};
+                      onChange([
+                        ...value,
+                        {
+                          reps: lastSet.reps || "",
+                          weight: lastSet.weight || "",
+                        },
+                      ]);
+                    }}
+                  >
+                    Add Set
+                  </Button>
+                </>
               )}
             />
-
-            <FormField
-              control={control}
-              name={`workout.${index}.complete`}
-              render={({ field }) => (
-                <FormItem className="hidden">
-                  <FormLabel>Complete</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="checkbox"
-                      {...register(`workout.${index}.complete` as const)}
-                      checked={field.value}
-                      onChange={(event) => field.onChange(event.target.checked)}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-
-            <Button type="button" onClick={() => remove(index)}>
+            <Button type="button" onClick={() => remove(exerciseIndex)}>
               Remove exercise
             </Button>
           </section>
@@ -277,17 +352,16 @@ export default function StartBlankWorkoutForm() {
           onClick={() => {
             append({
               exercise: "",
-              reps: "",
-              sets: 0,
-              weight: "",
-              complete: false,
+              set: [{ reps: "", weight: "" }],
             });
           }}
         >
           Add Exercise
         </Button>
 
-        <Button type="submit">Finish workout</Button>
+        <Button onClick={() => IsSubmitting(true)} type="submit">
+          Finish workout
+        </Button>
       </form>
     </Form>
   );

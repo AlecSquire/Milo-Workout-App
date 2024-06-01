@@ -5,7 +5,14 @@ import { PersonalBest, SavedLift, User, Session } from "@/types";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const useUserData = () => {
-  const [userData, setUserData] = useState<User | null>(null);
+  const [userData, setUserData] = useState<User | null>({
+    name: "",
+    email: "",
+    userID: "",
+    img: "",
+    personalBest: {} as PersonalBest,
+    savedLifts: [] as SavedLift[],
+  });
 
   useEffect(() => {
     const auth = getAuth();
