@@ -50,9 +50,9 @@ const DataTable = ({ lifts }: Props) => {
   };
 
   return (
-    <div className="w-full mt-5 overflow-x-auto">
+    <div className="w-full mt-5">
       <div className="rounded-md sm:border">
-        <Table className="min-w-full">
+        <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-16">Name</TableHead>
@@ -67,28 +67,16 @@ const DataTable = ({ lifts }: Props) => {
           <TableBody>
             {lifts && lifts.length > 0
               ? lifts.map((lift) => (
-                  <TableRow key={lift.name} className="w-full">
-                    <TableCell className="whitespace-nowrap">
-                      {capitalize(lift.name)}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      {capitalize(lift.type)}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      {capitalize(lift.muscle)}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      {capitalize(lift.equipment)}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      {capitalize(lift.difficulty)}
-                    </TableCell>
-                    <TableCell className="whitespace-normal">
+                  <TableRow key={lift.name} data-href="/" className="w-full">
+                    <TableCell>{capitalize(lift.name)}</TableCell>
+                    <TableCell>{capitalize(lift.type)}</TableCell>
+                    <TableCell>{capitalize(lift.muscle)}</TableCell>
+                    <TableCell>{capitalize(lift.equipment)}</TableCell>
+                    <TableCell>{capitalize(lift.difficulty)}</TableCell>
+                    <TableCell className="overflow-y-auto">
                       {renderInstructions(lift.instructions, lift.name)}
                     </TableCell>
-                    <TableCell className="whitespace-nowrap">
-                      {lift.select}
-                    </TableCell>
+                    <TableCell>{lift.select}</TableCell>
                   </TableRow>
                 ))
               : null}

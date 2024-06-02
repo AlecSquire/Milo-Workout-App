@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import {
   LineChart,
@@ -16,9 +15,6 @@ import {
 export default function WorkoutSessionVisual() {
   return (
     <div className="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-6 md:p-8 lg:p-10">
-      <h1 className=" text-xl rounded-md p-15	bg-orange-500	">
-        Still Under Construction{" "}
-      </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
         <div className="space-y-4">
           <div>

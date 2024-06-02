@@ -36,7 +36,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
           <SessionProvider session={session}>
             <AppWrapper>
               <div className="flex justify-center">
-                <div className="transform origin-top scale-75 w-full max-w-6xl">
+                <div className="transform origin-top scale-95 w-full max-w-6xl">
                   <nav className="flex flex-col justify-center items-center border-b">
                     <div className="w-full">
                       <MainNav />

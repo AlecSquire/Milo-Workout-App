@@ -1,12 +1,10 @@
 "use client";
 
-// Lifts.js
 import { useEffect, useState } from "react";
 import ExerciseForm from "./ExerciseForm";
 import DataTable from "./DataTable";
-import DataResponse from "./DataResponse";
 import { Card } from "@/components/ui/card";
-// import ComposableForm from "./ComposableForm";
+import FetchWorkout from "@/components/FetchWorkout";
 
 const Lifts = () => {
   const [lifts, setLifts] = useState([]);
@@ -14,9 +12,7 @@ const Lifts = () => {
   const [name, setName] = useState("");
   const [exercise, setExercise] = useState("");
   const [apiUrl, setApiUrl] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  // API key and base URL
   const headers = { "X-Api-Key": process.env.NEXT_PUBLIC_API_KEY_WORKOUT };
 
   // Handle selections
@@ -45,20 +41,25 @@ const Lifts = () => {
     );
   }, [muscleType, name, exercise]);
 
+  // Fetch data using custom hook
+  const { data, isLoading, isError } = FetchWorkout(apiUrl, headers);
+
+  useEffect(() => {
+    if (data) {
+      setLifts(data);
+    }
+  }, [data]);
+
   return (
     <Card>
+      {isLoading && <p>Loading...</p>}
+      {isError && <p>Error loading data</p>}
+
       <ExerciseForm
         onMuscleSelect={handleMuscleSelect}
         onName={handleNameSelect}
         onExerciseType={handleExerciseSelect}
         isLoading={isLoading}
-      />
-
-      <DataResponse
-        finalURL={apiUrl}
-        headers={headers}
-        onLiftsLoaded={setLifts}
-        setIsLoading={setIsLoading}
       />
       <DataTable lifts={lifts} />
     </Card>

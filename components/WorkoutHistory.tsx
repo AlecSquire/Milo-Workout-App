@@ -1,18 +1,17 @@
 "use client";
 import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface IconProps {
   className?: string;
 }
 export default function WorkoutHistory() {
-  const router = useRouter();
   return (
-    <div
+    <Link
+      href={"/WorkoutSessionVisual" as any}
       className="w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8"
-      onClick={() => router.push("/Dashboard/WorkoutSessionVisual")}
     >
-      <div className="mb-6">
+      <div className="mb-6 w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl font-bold">Workout History</h1>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -185,7 +184,7 @@ export default function WorkoutHistory() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Link>
   );
 }
 
