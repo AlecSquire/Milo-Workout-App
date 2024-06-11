@@ -1,6 +1,10 @@
 "use client";
-import { useState } from "react";
-import { useForm, FormProvider, Controller } from "react-hook-form";
+import {
+  useForm,
+  FormProvider,
+  Controller,
+  useController,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
@@ -27,31 +31,35 @@ import {
 } from "@/components/ui/form";
 
 import { muscleOptions, exerciseTypes } from "../../lib/ExerciseMappingData";
-import { FileSpreadsheetIcon } from "lucide-react";
 
 const FormSchema = z.object({
   muscle: z.array(z.string()).optional(),
   name: z.string().optional(),
   exerciseType: z.string().optional(),
 });
+
 interface FormProps {
-  onMuscleSelect: Function;
-  onExerciseType: Function;
-  onName: Function;
+  onMuscleSelect: (muscles: string[]) => void;
+  onExerciseType: (exerciseType: string) => void;
+  onName: (name: string) => void;
+  onFetch: () => void;
   isLoading: boolean;
 }
+
 interface Data {
   muscle?: string[];
   name?: string;
   exerciseType?: string;
 }
+
 const ExerciseForm = ({
   onMuscleSelect,
   onName,
   onExerciseType,
+  onFetch,
   isLoading,
 }: FormProps) => {
-  const formMethods = useForm({
+  const formMethods = useForm<Data>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       muscle: [],
@@ -60,12 +68,13 @@ const ExerciseForm = ({
     },
   });
 
-  const { handleSubmit, control, register } = formMethods;
+  const { handleSubmit, control } = formMethods;
 
   const onSubmit = (data: Data) => {
-    onMuscleSelect(data.muscle);
-    onName(data.name);
-    onExerciseType(data.exerciseType);
+    onMuscleSelect(data.muscle || []);
+    onName(data.name || "");
+    onExerciseType(data.exerciseType || "");
+    onFetch();
     console.log(data);
   };
 
@@ -78,28 +87,30 @@ const ExerciseForm = ({
         <FormField
           control={control}
           name="muscle"
-          render={() => (
+          render={({ field }) => (
             <FormItem className="flex flex-col w-full">
               <FormLabel className="text-base">Muscle groups</FormLabel>
               <FormDescription>Select muscles</FormDescription>
               <div className="mt-2">
-                {muscleOptions.map((muscle) => (
-                  <FormField
-                    key={muscle.id}
-                    control={control}
-                    name="muscle"
-                    render={({ field }) => (
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          {...field}
-                          className="h-4 w-4 text-indigo-600"
-                        />
-                        <FormLabel className="font-normal">
-                          {muscle.label}
-                        </FormLabel>
-                      </div>
-                    )}
-                  />
+                {muscleOptions.map((muscle: { id: string; label: string }) => (
+                  <div key={muscle.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={field.value?.includes(muscle.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          field.onChange([...(field.value || []), muscle.id]);
+                        } else {
+                          field.onChange(
+                            (field.value || []).filter((id) => id !== muscle.id)
+                          );
+                        }
+                      }}
+                      className="h-4 w-4 text-indigo-600"
+                    />
+                    <FormLabel className="font-normal">
+                      {muscle.label}
+                    </FormLabel>
+                  </div>
                 ))}
               </div>
               <FormMessage />
@@ -117,6 +128,12 @@ const ExerciseForm = ({
                   placeholder="This value can be partial"
                   {...field}
                   className="mt-1"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSubmit(onSubmit)();
+                    }
+                  }}
                 />
               </FormControl>
             </FormItem>
@@ -151,7 +168,13 @@ const ExerciseForm = ({
             </FormItem>
           )}
         />
-        {isLoading ? <ButtonLoading /> : <Button type="submit">Submit</Button>}
+        <div className="flex items-center mt-4 md:mt-0">
+          {isLoading ? (
+            <ButtonLoading />
+          ) : (
+            <Button type="submit">Submit</Button>
+          )}
+        </div>
       </form>
     </FormProvider>
   );

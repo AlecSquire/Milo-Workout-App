@@ -1,6 +1,6 @@
 "use client";
 import FetchRoutine from "./FetchRoutine";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { FormFields, StartNewForm } from "@/types";
 

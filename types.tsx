@@ -94,3 +94,28 @@ export type Toast = {
   description: React.ReactNode;
   status?: "success" | "error"; // Define the status property
 };
+export interface SetItem {
+  weight: number;
+  reps: number;
+  complete?: boolean;
+}
+
+export interface WorkoutItem {
+  exercise: string;
+  sets: number;
+  set?: SetItem[];
+}
+
+export interface Lift {
+  id: string;
+  workoutName: string;
+  description: string;
+  userID: string;
+  workout: WorkoutItem[];
+}
+
+export interface FormData {
+  workoutName: string;
+  description: string;
+  workout: Lift[];
+}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 import { ModeToggle } from "./ModeToggle";
 import DropDownUser from "@/components/ui/DropDownUser";
-import { useAppContext } from "@/app/context/Index";
+import { useAppContext } from "@/context";
 
 const MainNav = () => {
   const { userData, setUserData } = useAppContext();

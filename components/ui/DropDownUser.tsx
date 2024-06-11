@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Image from "next/image";
-import { useAppContext } from "@/app/context/Index";
+import { useAppContext } from "@/context/index";
 import { signOut } from "firebase/auth";
 
 export default function DropDownUser() {

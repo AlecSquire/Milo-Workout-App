@@ -8,7 +8,7 @@ import MainNav from "@/components/MainNav";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { SessionProvider } from "next-auth/react";
-import { AppWrapper } from "../app/context/Index";
+import { AppWrapper } from "@/context/index";
 
 const inter = Inter({ subsets: ["latin"] });
 

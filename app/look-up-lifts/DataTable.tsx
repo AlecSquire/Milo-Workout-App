@@ -14,7 +14,7 @@ interface Props {
   lifts: Exercise[];
 }
 
-const DataTable = ({ lifts }: Props) => {
+const DataTable: React.FC<Props> = ({ lifts }) => {
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
 
   const toggleExpand = (name: string) => {
@@ -26,11 +26,7 @@ const DataTable = ({ lifts }: Props) => {
 
   const renderInstructions = (instructions: string, name: string) => {
     const isExpanded = expanded[name];
-    const maxLength = 100; // Define the length at which to truncate
-
-    if (instructions.length <= maxLength) {
-      return <span>{capitalize(instructions)}</span>;
-    }
+    const maxLength = 100;
 
     return (
       <div>
@@ -39,12 +35,14 @@ const DataTable = ({ lifts }: Props) => {
             ? capitalize(instructions)
             : `${capitalize(instructions.slice(0, maxLength))}...`}
         </span>
-        <button
-          onClick={() => toggleExpand(name)}
-          className="text-blue-500 ml-2"
-        >
-          {isExpanded ? "Show Less" : "Show More"}
-        </button>
+        {instructions.length > maxLength && (
+          <button
+            onClick={() => toggleExpand(name)}
+            className="text-blue-500 ml-2"
+          >
+            {isExpanded ? "Show Less" : "Show More"}
+          </button>
+        )}
       </div>
     );
   };
@@ -61,25 +59,33 @@ const DataTable = ({ lifts }: Props) => {
               <TableHead>Equipment</TableHead>
               <TableHead>Difficulty</TableHead>
               <TableHead>Instructions</TableHead>
-              <TableHead>Select</TableHead>
+              {/* <TableHead>Select</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {lifts && lifts.length > 0
-              ? lifts.map((lift) => (
-                  <TableRow key={lift.name} data-href="/" className="w-full">
-                    <TableCell>{capitalize(lift.name)}</TableCell>
-                    <TableCell>{capitalize(lift.type)}</TableCell>
-                    <TableCell>{capitalize(lift.muscle)}</TableCell>
-                    <TableCell>{capitalize(lift.equipment)}</TableCell>
-                    <TableCell>{capitalize(lift.difficulty)}</TableCell>
-                    <TableCell className="overflow-y-auto">
-                      {renderInstructions(lift.instructions, lift.name)}
-                    </TableCell>
-                    <TableCell>{lift.select}</TableCell>
-                  </TableRow>
-                ))
-              : null}
+            {lifts && lifts.length > 0 ? (
+              lifts.map((lift) => (
+                <TableRow key={lift.name} className="w-full">
+                  <TableCell className="w-80">
+                    {capitalize(lift.name)}
+                  </TableCell>
+                  <TableCell>{capitalize(lift.type)}</TableCell>
+                  <TableCell>{capitalize(lift.muscle)}</TableCell>
+                  <TableCell>{capitalize(lift.equipment)}</TableCell>
+                  <TableCell>{capitalize(lift.difficulty)}</TableCell>
+                  <TableCell className="overflow-y-auto">
+                    {renderInstructions(lift.instructions, lift.name)}
+                  </TableCell>
+                  {/* <TableCell>{lift.select}</TableCell> */}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center">
+                  No data available
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

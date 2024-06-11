@@ -14,8 +14,9 @@ import {
   Bar,
   ResponsiveContainer,
 } from "recharts";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-const DashboardPage = () => {
+const Dashboard = () => {
   const { sessionData, loading } = useSessionData();
 
   if (loading) {
@@ -35,13 +36,15 @@ const DashboardPage = () => {
 
   return (
     <>
-      <h1 className="text-xl rounded-md p-2 bg-orange-500">
-        Still Under Construction
-      </h1>
-      <WorkoutHistory />
-      <h1>Training History</h1>
-
-      <h2>Reps Over Time</h2>
+      {/* <ScrollArea className="w-96 whitespace-nowrap rounded-md border"> */}
+      <div className="flex w-max space-x-4 p-4"></div>
+      <h1 className="text-2xl font-bold">Workout History</h1>
+      {/* <ScrollArea className="w-96 whitespace-nowrap rounded-md border"> */}
+      <div className="flex w-max space-x-4 p-4">
+        <WorkoutHistory />
+      </div>
+      {/* </ScrollArea> */}
+      <h1 className="text-2xl font-bold">Workout Data</h1>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -68,4 +71,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage;
+export default Dashboard;

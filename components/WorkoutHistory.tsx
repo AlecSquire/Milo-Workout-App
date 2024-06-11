@@ -8,7 +8,7 @@ interface IconProps {
 export default function WorkoutHistory() {
   return (
     <Link
-      href={"/WorkoutSessionVisual" as any}
+      href="/WorkoutSessionVisual"
       className="w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8"
     >
       <div className="mb-6 w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">

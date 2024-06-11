@@ -1,6 +1,6 @@
 import useSWR from "swr";
 
-const fetcher = ({
+const fetcher = async ({
   url,
   headers,
 }: {
@@ -16,7 +16,14 @@ const fetcher = ({
     return res.json();
   });
 
-function FetchWorkout(finalURL: string, headers: { "X-Api-Key"?: string }) {
+interface FetchWorkoutProps {
+  finalURL: string;
+  headers: {
+    "X-Api-Key"?: string;
+  };
+}
+
+function FetchWorkout({ finalURL, headers }: FetchWorkoutProps) {
   const { data, error, isValidating } = useSWR(
     { url: finalURL, headers },
     fetcher

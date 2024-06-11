@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
@@ -10,16 +8,12 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
-
 import { db } from "@/firebase/config";
-import { FormFields, StartNewForm } from "@/types";
-import { useRouter } from "next/navigation";
-import UserTemplates from "../UserTemplates";
+import { FormFields, Lift, StartNewForm, WorkoutItem } from "@/types";
 import RoutineDataTable from "./RoutineDataTable";
 
 interface FetchRoutineProps {
   routineID?: string;
-  TimeStamp?: string;
   setUserTemplate: React.Dispatch<React.SetStateAction<StartNewForm[]>>;
   userTemplate: StartNewForm[];
 }
@@ -29,7 +23,7 @@ const FetchRoutine: React.FC<FetchRoutineProps> = ({
   setUserTemplate,
   userTemplate,
 }) => {
-  const [lifts, setLifts] = useState<FormFields[]>([]);
+  const [lifts, setLifts] = useState<Lift[]>([]);
   console.log(lifts);
 
   useEffect(() => {
@@ -43,11 +37,18 @@ const FetchRoutine: React.FC<FetchRoutineProps> = ({
           limit(1)
         );
         const snapshot = await getDocs(q);
-        const routineData: FormFields[] = [];
+        const routineData: Lift[] = [];
 
         snapshot.forEach((doc) => {
-          const data = doc.data() as any;
-          routineData.push({ id: doc.id, ...data });
+          const data = doc.data() as FormFields;
+          // Ensure description is always a string
+          const lift: Lift = {
+            ...data,
+            id: doc.id,
+            description: data.description || "",
+            userID: data.userID || "",
+          };
+          routineData.push(lift);
         });
 
         if (routineData.length > 0) {
