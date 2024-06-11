@@ -6,6 +6,7 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
+
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -26,9 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "app/routines/test.jsx",
-    "app/routines/page.jsx",
-    "app/Dashboard/WorkoutSessionVisual"
+    "app/**/*.ts",
+    "app/**/*.tsx"
   ],
   "exclude": ["node_modules"]
 }

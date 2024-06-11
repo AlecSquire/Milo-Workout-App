@@ -7,10 +7,7 @@ interface IconProps {
 }
 export default function WorkoutHistory() {
   return (
-    <Link
-      href="/WorkoutSessionVisual"
-      className="w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8"
-    >
+    <div className="w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <div className="mb-6 w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl font-bold">Workout History</h1>
       </div>
@@ -184,7 +181,7 @@ export default function WorkoutHistory() {
           </CardContent>
         </Card>
       </div>
-    </Link>
+    </div>
   );
 }
 

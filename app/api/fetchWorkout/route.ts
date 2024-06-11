@@ -1,34 +1,26 @@
-import { NextResponse } from "next/server";
-import fetch from "node-fetch";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request) {
+export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const muscle = searchParams.get("muscle");
   const name = searchParams.get("name");
-  const type = searchParams.get("type");
-  const API_KEY_WORKOUT = process.env.API_KEY_WORKOUT;
 
-  const queryParams = new URLSearchParams();
-  if (muscle) queryParams.append("muscle", muscle);
-  if (name) queryParams.append("name", name);
-  if (type) queryParams.append("type", type);
+  const fetcher = async (url: string, headers: { "X-Api-Key"?: string }) => {
+    const res = await fetch(url, { headers });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text);
+    }
+    return res.json();
+  };
 
-  const apiUrl = `https://api.api-ninjas.com/v1/exercises?${queryParams.toString()}&offset=2`;
+  const finalURL = `https://api.example.com/workouts?muscle=${muscle}&name=${name}`;
+  const headers = { "X-Api-Key": request.headers.get("X-Api-Key") || "" };
 
   try {
-    const response = await fetch(apiUrl, {
-      headers: { "X-Api-Key": API_KEY_WORKOUT },
-    });
-    if (!response.ok) {
-      const errorText = await response.text();
-      return NextResponse.json(
-        { error: errorText },
-        { status: response.status }
-      );
-    }
-    const data = await response.json();
-    return NextResponse.json(data, { status: 200 });
-  } catch (error) {
+    const data = await fetcher(finalURL, headers);
+    return NextResponse.json(data);
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

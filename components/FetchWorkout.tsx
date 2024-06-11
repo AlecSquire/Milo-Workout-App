@@ -1,20 +1,17 @@
 import useSWR from "swr";
 
-const fetcher = async ({
-  url,
-  headers,
-}: {
+const fetcher = async (args: {
   url: string;
   headers: { "X-Api-Key"?: string };
-}) =>
-  fetch(url, { headers }).then((res) => {
-    if (!res.ok) {
-      return res.text().then((text) => {
-        throw new Error(text);
-      });
-    }
-    return res.json();
-  });
+}) => {
+  const { url, headers } = args;
+  const res = await fetch(url, { headers });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text);
+  }
+  return res.json();
+};
 
 interface FetchWorkoutProps {
   finalURL: string;
@@ -29,11 +26,16 @@ function FetchWorkout({ finalURL, headers }: FetchWorkoutProps) {
     fetcher
   );
 
-  return {
-    data,
-    isLoading: isValidating,
-    isError: !!error,
-  };
+  if (isValidating) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!data) return <div>No data found</div>;
+
+  return (
+    <div>
+      <h1>Workout Data</h1>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
 }
 
 export default FetchWorkout;
